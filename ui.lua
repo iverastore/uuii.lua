@@ -806,7 +806,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 900, 0, 280);
+                size = properties.size or properties.Size or dim2(0, 516, 0, 563);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1057,7 +1057,7 @@
                         Parent = library.items;
                         BackgroundTransparency = 1;
                         Name = "\0";
-                        Visible = true;
+                        Visible = false;
                         BorderColor3 = rgb(0, 0, 0);
                         Size = dim2(1, 0, 1, 0);
                         BorderSizePixel = 0;
