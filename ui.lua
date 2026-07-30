@@ -1728,7 +1728,8 @@
             end;
             
             function cfg.set(bool)
-                library:tween(items[ "text" ], {TextColor3 = bool and library.Theme.Accent or resolveThemeColor({"Text", "Unselected"}), FontFace = bool and library.fontBold or library.font})
+                items[ "text" ].FontFace = bool and library.fontBold or library.font
+                library:tween(items[ "text" ], {TextColor3 = bool and library.Theme.Accent or resolveThemeColor({"Text", "Unselected"})})
                 library:tween(items[ "toggle_outline" ], {BackgroundTransparency = bool and 0 or 1})
                 library:tween(items[ "toggle_shading" ], {BackgroundTransparency = bool and 0 or 1})
                 library:tween(items[ "toggle_inline" ], {BackgroundColor3 = bool and library.Theme.Accent or rgb(74, 74, 74)})
