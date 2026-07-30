@@ -806,7 +806,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 650, 0, 460);
+                size = properties.size or properties.Size or dim2(0, 620, 0, 420);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1040,11 +1040,11 @@
                         BorderColor3 = rgb(0, 0, 0);
                         Parent = items[ "tab_button" ];
                         Name = "\0";
-                        Size = dim2(0, 32, 0, 32);
+                        Size = dim2(0, 26, 0, 26);
                         AnchorPoint = vec2(0.5, 0);
                         Image = cfg.icon;
                         BackgroundTransparency = 1;
-                        Position = dim2(0.5, 0, 0, 0);
+                        Position = dim2(0.5, 0, 0, 3);
                         Selectable = true;
                         BorderSizePixel = 0;
                         BackgroundColor3 = rgb(255, 255, 255)
@@ -1068,17 +1068,17 @@
                         FillDirection = Enum.FillDirection.Horizontal;
                         HorizontalFlex = Enum.UIFlexAlignment.Fill;
                         Parent = items[ "tab" ];
-                        Padding = dim(0, 21);
+                        Padding = dim(0, 14);
                         SortOrder = Enum.SortOrder.LayoutOrder;
                         VerticalFlex = Enum.UIFlexAlignment.Fill
                     });
                     
                     library:create( "UIPadding" , {
-                        PaddingTop = dim(0, 24);
-                        PaddingBottom = dim(0, 21);
+                        PaddingTop = dim(0, 16);
+                        PaddingBottom = dim(0, 14);
                         Parent = items[ "tab" ];
-                        PaddingRight = dim(0, 21);
-                        PaddingLeft = dim(0, 21)
+                        PaddingRight = dim(0, 14);
+                        PaddingLeft = dim(0, 14)
                     });     
                     
                     for _,column in {"left", "right"} do 
@@ -1094,7 +1094,7 @@
 
                         library:create( "UIListLayout" , {
                             Parent = items[ column ];
-                            Padding = dim(0, 15);
+                            Padding = dim(0, 10);
                             SortOrder = Enum.SortOrder.LayoutOrder
                         });
                     end                  
@@ -1432,8 +1432,8 @@
                     Parent = items[ "section_outline" ];
                     Name = "\0";
                     BackgroundTransparency = 1;
-                    Position = dim2(0, 8, 0, -15);
-                    Size = dim2(0, 0, 0, 12);
+                    Position = dim2(0, 8, 0, -13);
+                    Size = dim2(0, 0, 0, 14);
                     BorderSizePixel = 0;
                     AutomaticSize = Enum.AutomaticSize.X;
                     BackgroundColor3 = rgb(255, 255, 255)
@@ -1478,7 +1478,7 @@
                         Name = "\0";
                         BackgroundTransparency = 1;
                         Text = "";
-                        Size = dim2(0, 0, 0, 12);
+                        Size = dim2(0, 0, 0, 14);
                         BorderSizePixel = 0;
                         BackgroundColor3 = rgb(255, 255, 255);
                         AutomaticSize = Enum.AutomaticSize.X;
@@ -1492,7 +1492,7 @@
                         BackgroundTransparency = 1;
                         Size = dim2(0, 0, 1, 0);
                         BorderSizePixel = 0;
-                        TextSize = 10;
+                        TextSize = 11;
                         BackgroundColor3 = rgb(255, 255, 255);
                         AutomaticSize = Enum.AutomaticSize.X;
                     });
