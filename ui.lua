@@ -435,10 +435,6 @@
         pcall(function()
             library.font = Font.new(getcustomasset(library.directory .. "/fonts/main_encoded.ttf"), Enum.FontWeight.Regular)
         end)
-        library.fontBold = Font.fromEnum(Enum.Font.SourceSansBold)
-        pcall(function()
-            library.fontBold = Font.new(getcustomasset(library.directory .. "/fonts/main_encoded.ttf"), Enum.FontWeight.Bold)
-        end)
     -- █
 --
 
@@ -1061,7 +1057,7 @@
                         Parent = library.items;
                         BackgroundTransparency = 1;
                         Name = "\0";
-                        Visible = false;
+                        Visible = true;
                         BorderColor3 = rgb(0, 0, 0);
                         Size = dim2(1, 0, 1, 0);
                         BorderSizePixel = 0;
@@ -1269,7 +1265,8 @@
                     BackgroundColor3 = rgb(255, 255, 255);
                     BorderColor3 = rgb(0, 0, 0);
                     BorderSizePixel = 0;
-                    CanvasSize = dim2(0, 0, 0, 0)
+                    CanvasSize = dim2(0, 0, 0, 0);
+                    Visible = true
                 });
                 
                 items[ "elements" ] = library:create( "Frame" , {
@@ -1728,7 +1725,6 @@
             end;
             
             function cfg.set(bool)
-                items[ "text" ].FontFace = bool and library.fontBold or library.font
                 library:tween(items[ "text" ], {TextColor3 = bool and library.Theme.Accent or resolveThemeColor({"Text", "Unselected"})})
                 library:tween(items[ "toggle_outline" ], {BackgroundTransparency = bool and 0 or 1})
                 library:tween(items[ "toggle_shading" ], {BackgroundTransparency = bool and 0 or 1})
