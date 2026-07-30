@@ -806,7 +806,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 700, 0, 390);
+                size = properties.size or properties.Size or dim2(0, 760, 0, 320);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1068,17 +1068,17 @@
                         FillDirection = Enum.FillDirection.Horizontal;
                         HorizontalFlex = Enum.UIFlexAlignment.Fill;
                         Parent = items[ "tab" ];
-                        Padding = dim(0, 14);
+                        Padding = dim(0, 10);
                         SortOrder = Enum.SortOrder.LayoutOrder;
                         VerticalFlex = Enum.UIFlexAlignment.Fill
                     });
                     
                     library:create( "UIPadding" , {
-                        PaddingTop = dim(0, 16);
-                        PaddingBottom = dim(0, 14);
+                        PaddingTop = dim(0, 10);
+                        PaddingBottom = dim(0, 8);
                         Parent = items[ "tab" ];
-                        PaddingRight = dim(0, 14);
-                        PaddingLeft = dim(0, 14)
+                        PaddingRight = dim(0, 10);
+                        PaddingLeft = dim(0, 10)
                     });     
                     
                     for _,column in {"left", "right"} do 
@@ -1094,7 +1094,7 @@
 
                         library:create( "UIListLayout" , {
                             Parent = items[ column ];
-                            Padding = dim(0, 10);
+                            Padding = dim(0, 6);
                             SortOrder = Enum.SortOrder.LayoutOrder
                         });
                     end                  
