@@ -806,7 +806,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 620, 0, 420);
+                size = properties.size or properties.Size or dim2(0, 700, 0, 390);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1452,8 +1452,8 @@
                     Name = "\0";
                     BackgroundTransparency = 1;
                     Position = dim2(0, 0, 0, 0);
-                    Size = dim2(1, 0, 0, 0);
-                    AutomaticSize = Enum.AutomaticSize.Y;
+                    Size = dim2(1, 0, 1, -8);
+                    AutomaticSize = Enum.AutomaticSize.None;
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(255, 255, 255)
                 });
@@ -1492,7 +1492,7 @@
                         BackgroundTransparency = 1;
                         Size = dim2(0, 0, 1, 0);
                         BorderSizePixel = 0;
-                        TextSize = 11;
+                        TextSize = 13;
                         BackgroundColor3 = rgb(255, 255, 255);
                         AutomaticSize = Enum.AutomaticSize.X;
                     });
@@ -1518,14 +1518,14 @@
                         Parent = items[ "content_area" ];
                         Name = "\0";
                         BackgroundTransparency = 1;
-                        Size = dim2(1, 0, 0, 0);
-                        AutomaticSize = Enum.AutomaticSize.Y;
+                        Size = dim2(1, 0, 0, 140);
+                        AutomaticSize = Enum.AutomaticSize.None;
                         BackgroundColor3 = rgb(255, 255, 255);
                         BorderColor3 = rgb(0, 0, 0);
                         BorderSizePixel = 0;
                         CanvasSize = dim2(0, 0, 0, 0);
                         Visible = false;
-                        ScrollingEnabled = false;
+                        ScrollingEnabled = true;
                     });
 
                     subItems[ "elements" ] = library:create( "Frame" , {
