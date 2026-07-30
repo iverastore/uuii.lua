@@ -435,6 +435,10 @@
         pcall(function()
             library.font = Font.new(getcustomasset(library.directory .. "/fonts/main_encoded.ttf"), Enum.FontWeight.Regular)
         end)
+        library.fontBold = Font.fromEnum(Enum.Font.SourceSansBold)
+        pcall(function()
+            library.fontBold = Font.new(getcustomasset(library.directory .. "/fonts/main_encoded.ttf"), Enum.FontWeight.Bold)
+        end)
     -- █
 --
 
@@ -806,7 +810,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 760, 0, 320);
+                size = properties.size or properties.Size or dim2(0, 900, 0, 280);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1724,7 +1728,7 @@
             end;
             
             function cfg.set(bool)
-                library:tween(items[ "text" ], {TextColor3 = bool and library.Theme.Accent or resolveThemeColor({"Text", "Unselected"})})
+                library:tween(items[ "text" ], {TextColor3 = bool and library.Theme.Accent or resolveThemeColor({"Text", "Unselected"}), FontFace = bool and library.fontBold or library.font})
                 library:tween(items[ "toggle_outline" ], {BackgroundTransparency = bool and 0 or 1})
                 library:tween(items[ "toggle_shading" ], {BackgroundTransparency = bool and 0 or 1})
                 library:tween(items[ "toggle_inline" ], {BackgroundColor3 = bool and library.Theme.Accent or rgb(74, 74, 74)})
@@ -2152,7 +2156,7 @@
                 });
 
                 button.MouseEnter:Connect(function()
-                    library:tween(button, {TextColor3 = resolveThemeColor({"Text", "Main"})})
+                    library:tween(button, {TextColor3 = resolveThemeColor({"Text", "Main"}), BackgroundTransparency = 0.7, BackgroundColor3 = rgb(40, 40, 40)})
                 end)
                 button.MouseLeave:Connect(function()
                     local isSelected = false
@@ -2161,8 +2165,10 @@
                     else
                         isSelected = flags[cfg.flag] == button.Text
                     end
-                    if not isSelected then
-                        library:tween(button, {TextColor3 = resolveThemeColor({"Text", "Unselected"})})
+                    if isSelected then
+                        library:tween(button, {TextColor3 = resolveThemeColor({"Text", "Main"}), BackgroundTransparency = 0.5, BackgroundColor3 = rgb(30, 30, 30)})
+                    else
+                        library:tween(button, {TextColor3 = resolveThemeColor({"Text", "Unselected"}), BackgroundTransparency = 1})
                     end
                 end)
 
@@ -2318,9 +2324,17 @@
                 cfg.set_visible(cfg.open)
             end)
 
-            library:connection(uis.InputEnded, function(input)
+            library:connection(uis.InputBegan, function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
                     if not (library:mouse_in_frame(items.dropdown_holder) or library:mouse_in_frame(items.object)) then 
+                        if cfg.open then
+                            cfg.open = false
+                            cfg.set_visible(false)
+                        end
+                    end
+                end
+                if input.UserInputType == Enum.UserInputType.MouseButton2 then
+                    if cfg.open then
                         cfg.open = false
                         cfg.set_visible(false)
                     end
