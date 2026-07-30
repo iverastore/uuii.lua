@@ -1749,6 +1749,8 @@
                 cfg.set(cfg.enabled)
             end)
             
+            items[ "object" ].Active = true
+            
             cfg.set(cfg.default)
 
             config_flags[cfg.flag] = cfg.set
@@ -2337,6 +2339,8 @@
                     end
                 end
             end)
+            
+            items.dropdown_outline.Active = true
             
             config_flags[cfg.flag] = cfg.set
             
