@@ -1255,9 +1255,9 @@
                 });
                 
                 items[ "scrolling" ] = library:create( "ScrollingFrame" , {
-                    ScrollBarImageColor3 = rgb(0, 0, 0);
+                    ScrollBarImageColor3 = rgb(90, 90, 90);
                     Active = true;
-                    ScrollBarThickness = 0;
+                    ScrollBarThickness = 4;
                     Parent = items[ "section_shadow_three" ];
                     Name = "\0";
                     BackgroundTransparency = 1;
@@ -1419,7 +1419,8 @@
                     Size = dim2(1, 0, 1, 0);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(14, 14, 14),
-                    AutomaticSize = Enum.AutomaticSize.Y
+                    AutomaticSize = Enum.AutomaticSize.None,
+                    ClipsDescendants = true
                 });
 
                 library:create( "UICorner" , {
@@ -1442,7 +1443,7 @@
                 library:create( "UIListLayout" , {
                     Parent = items[ "subtab_holder" ];
                     FillDirection = Enum.FillDirection.Horizontal;
-                    Padding = dim(0, 6);
+                    Padding = dim(0, 8);
                     SortOrder = Enum.SortOrder.LayoutOrder;
                 });
 
@@ -1452,7 +1453,8 @@
                     Name = "\0";
                     BackgroundTransparency = 1;
                     Position = dim2(0, 0, 0, 0);
-                    Size = dim2(1, 0, 1, -8);
+                    Position = dim2(0, 0, 0, 18);
+                    Size = dim2(1, 0, 1, -18);
                     AutomaticSize = Enum.AutomaticSize.None;
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(255, 255, 255)
@@ -1487,12 +1489,12 @@
                     subItems[ "button_text" ] = library:create( "TextLabel" , {
                         Parent = subItems[ "button" ];
                         FontFace = library.font;
-                        TextColor3 = rgb(100, 100, 100);
+                        TextColor3 = rgb(125, 125, 125);
                         Text = name;
                         BackgroundTransparency = 1;
                         Size = dim2(0, 0, 1, 0);
                         BorderSizePixel = 0;
-                        TextSize = 13;
+                        TextSize = 9;
                         BackgroundColor3 = rgb(255, 255, 255);
                         AutomaticSize = Enum.AutomaticSize.X;
                     });
@@ -1512,13 +1514,13 @@
                     });
 
                     subItems[ "scrolling" ] = library:create( "ScrollingFrame" , {
-                        ScrollBarImageColor3 = rgb(0, 0, 0);
+                        ScrollBarImageColor3 = rgb(90, 90, 90);
                         Active = true;
-                        ScrollBarThickness = 0;
+                        ScrollBarThickness = 4;
                         Parent = items[ "content_area" ];
                         Name = "\0";
                         BackgroundTransparency = 1;
-                        Size = dim2(1, 0, 0, 140);
+                        Size = dim2(1, 0, 1, 0);
                         AutomaticSize = Enum.AutomaticSize.None;
                         BackgroundColor3 = rgb(255, 255, 255);
                         BorderColor3 = rgb(0, 0, 0);
@@ -1548,7 +1550,7 @@
 
                     local subLayout = library:create( "UIListLayout" , {
                         Parent = subItems[ "elements" ];
-                        Padding = dim(0, 5);
+                        Padding = dim(0, 4);
                         SortOrder = Enum.SortOrder.LayoutOrder
                     });
 
