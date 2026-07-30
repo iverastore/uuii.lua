@@ -1372,8 +1372,7 @@
                     BackgroundTransparency = 1;
                     Parent = self.items[ cfg.side == 1 and "left" or cfg.side == 2 and "right" or cfg.side ];
                     BorderColor3 = rgb(0, 0, 0);
-                    AutomaticSize = Enum.AutomaticSize.Y;
-                    Size = dim2(1, 0, 0, 24);
+                    Size = dim2(1, 0, cfg.size, 0);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(8, 8, 8)
                 });
@@ -1419,7 +1418,6 @@
                     Size = dim2(1, 0, 1, 0);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(14, 14, 14),
-                    AutomaticSize = Enum.AutomaticSize.None,
                     ClipsDescendants = true
                 });
 
@@ -1453,9 +1451,7 @@
                     Name = "\0";
                     BackgroundTransparency = 1;
                     Position = dim2(0, 0, 0, 0);
-                    Position = dim2(0, 0, 0, 18);
-                    Size = dim2(1, 0, 1, -18);
-                    AutomaticSize = Enum.AutomaticSize.None;
+                    Size = dim2(1, 0, 1, 0);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(255, 255, 255)
                 });
@@ -1521,7 +1517,6 @@
                         Name = "\0";
                         BackgroundTransparency = 1;
                         Size = dim2(1, 0, 1, 0);
-                        AutomaticSize = Enum.AutomaticSize.None;
                         BackgroundColor3 = rgb(255, 255, 255);
                         BorderColor3 = rgb(0, 0, 0);
                         BorderSizePixel = 0;
@@ -1591,6 +1586,8 @@
                 if not cfg.selected_subtab then
                     cfg.selected_subtab = sub
                     sub.set_visible(true)
+                else
+                    sub.set_visible(false)
                 end
 
                 table.insert(cfg.subtabs, sub)
