@@ -762,12 +762,27 @@
         end
 
         function library:unload_menu() 
+            if library.WatermarkObj and library.WatermarkObj.Gui then
+                pcall(function() library.WatermarkObj.Gui:Destroy() end)
+                library.WatermarkObj = nil
+            end
+            if library.TargetHUDObj and library.TargetHUDObj.Gui then
+                pcall(function() library.TargetHUDObj.Gui:Destroy() end)
+                library.TargetHUDObj = nil
+            end
+            if library.KeybindListObj and library.KeybindListObj.Gui then
+                pcall(function() library.KeybindListObj.Gui:Destroy() end)
+                library.KeybindListObj = nil
+            end
+
             if library[ "items" ] then 
                 library[ "items" ]:Destroy()
+                library[ "items" ] = nil
             end
 
             if library[ "other" ] then 
                 library[ "other" ]:Destroy()
+                library[ "other" ] = nil
             end 
             
             for index, connection in library.connections do 
@@ -776,6 +791,9 @@
             end
             
             library.connections = {}
+            library.current = nil
+            library.current_open = nil
+            library.selected_tab = nil
         end 
 
         function library:Unload()
@@ -788,7 +806,7 @@
             local cfg = { 
                 -- Properties
                 name = properties.name or properties.Name or "nebula";
-                size = properties.size or properties.Size or dim2(0, 650, 0, 500);
+                size = properties.size or properties.Size or dim2(0, 650, 0, 460);
                 logo = properties.logo or properties.Logo or "rbxassetid://132488048637620";
 
                 selected_tab;
@@ -1354,7 +1372,8 @@
                     BackgroundTransparency = 1;
                     Parent = self.items[ cfg.side == 1 and "left" or cfg.side == 2 and "right" or cfg.side ];
                     BorderColor3 = rgb(0, 0, 0);
-                    Size = dim2(1, 0, cfg.size, 0);
+                    AutomaticSize = Enum.AutomaticSize.Y;
+                    Size = dim2(1, 0, 0, 24);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(8, 8, 8)
                 });
@@ -1399,7 +1418,8 @@
                     BorderColor3 = rgb(0, 0, 0);
                     Size = dim2(1, 0, 1, 0);
                     BorderSizePixel = 0;
-                    BackgroundColor3 = rgb(14, 14, 14)
+                    BackgroundColor3 = rgb(14, 14, 14),
+                    AutomaticSize = Enum.AutomaticSize.Y
                 });
 
                 library:create( "UICorner" , {
@@ -1432,7 +1452,8 @@
                     Name = "\0";
                     BackgroundTransparency = 1;
                     Position = dim2(0, 0, 0, 0);
-                    Size = dim2(1, 0, 1, 0);
+                    Size = dim2(1, 0, 0, 0);
+                    AutomaticSize = Enum.AutomaticSize.Y;
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(255, 255, 255)
                 });
@@ -1497,12 +1518,14 @@
                         Parent = items[ "content_area" ];
                         Name = "\0";
                         BackgroundTransparency = 1;
-                        Size = dim2(1, 0, 1, 0);
+                        Size = dim2(1, 0, 0, 0);
+                        AutomaticSize = Enum.AutomaticSize.Y;
                         BackgroundColor3 = rgb(255, 255, 255);
                         BorderColor3 = rgb(0, 0, 0);
                         BorderSizePixel = 0;
                         CanvasSize = dim2(0, 0, 0, 0);
                         Visible = false;
+                        ScrollingEnabled = false;
                     });
 
                     subItems[ "elements" ] = library:create( "Frame" , {
@@ -4310,11 +4333,13 @@ function library:KeybindList(options)
     end)
 
     local obj = {
+        Gui = keylist_gui,
         SetVisibility = function(self, bool)
             container.Visible = bool
         end
     }
     library.KeyList = obj
+    library.KeybindListObj = obj
     return obj
 end
 
