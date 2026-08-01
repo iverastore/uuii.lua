@@ -7159,6 +7159,18 @@ end
 DefaultThemes = Library.GetTableIndexes(ThemeTable.Presets, true)
 Library.UpdateThemeList()
 
+do
+    Library.ToggleKey = Enum.KeyCode.RightShift
+    Library.AddConnection(UserInputService.InputBegan, LPH_NO_VIRTUALIZE(function(Input, Processed)
+        if Processed then return end
+        if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode == Library.ToggleKey then
+            if Library.ToggleMenu then
+                Library.ToggleMenu()
+            end
+        end
+    end))
+end
+
 
 
 
