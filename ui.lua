@@ -555,12 +555,21 @@ function Library:Window(Opts)
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	});
 
-	local Outer = self:CreateInstance("CanvasGroup", {
-		Name = "Outer";
+	local FadeGroup = self:CreateInstance("CanvasGroup", {
+		Name = "FadeGroup";
 		Parent = Gui;
 		AnchorPoint = Vector2.new(0.5, 0.5);
 		Position = UDim2.new(0.5, 0, 0.5, 0);
 		Size = UDim2.fromOffset(Width, Height);
+		BackgroundTransparency = 1;
+		BorderSizePixel = 0;
+		GroupTransparency = 0;
+	});
+
+	local Outer = self:CreateInstance("Frame", {
+		Name = "Outer";
+		Parent = FadeGroup;
+		Size = UDim2.new(1, 0, 1, 0);
 		BackgroundColor3 = Color3.fromHex("FFFFFF");
 		BorderSizePixel = 0;
 	});
@@ -663,10 +672,10 @@ function Library:Window(Opts)
 	ContentEdge("BottomBlack", Vector2.new(0, 1), UDim2.new(0, 0, 1, 0),  UDim2.new(1, 0, 0, 1),   "000000");
 	ContentEdge("BottomGray",  Vector2.new(0, 1), UDim2.new(0, 1, 1, -1), UDim2.new(1, -2, 0, 1),  "393939");
 
-	self:Draggable(Outer);
-	self:Resizable(Outer, Vector2.new(MinWidth, MinHeight));
+	self:Draggable(FadeGroup);
+	self:Resizable(FadeGroup, Vector2.new(MinWidth, MinHeight));
 
-	local Window = { Gui = Gui, Outer = Outer, TopLine = TopLine, Content = Content };
+	local Window = { Gui = Gui, Outer = Outer, FadeGroup = FadeGroup, TopLine = TopLine, Content = Content };
 	Window._Tabs = {};
 
 	function Window:Tab(NameOrOpts)
@@ -4926,9 +4935,9 @@ function Library:Window(Opts)
 		local Info = TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
 		if self.Visible then
 			Gui.Enabled = true;
-			Library:Tween(Outer, Info, { GroupTransparency = 0 }):Play();
+			Library:Tween(FadeGroup, Info, { GroupTransparency = 0 }):Play();
 		else
-			Library:Tween(Outer, Info, { GroupTransparency = 1 }):Play();
+			Library:Tween(FadeGroup, Info, { GroupTransparency = 1 }):Play();
 			task.delay(Info.Time, function()
 				if self._FadeToken == Mine and not self.Visible then
 					Gui.Enabled = false;
