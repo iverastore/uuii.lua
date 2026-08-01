@@ -7200,7 +7200,7 @@ do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
         Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
     }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
 
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM})
@@ -7255,7 +7255,7 @@ do
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
         Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
         AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
     }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL})
 
@@ -7750,3 +7750,4 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
 
     return result
 end
+
