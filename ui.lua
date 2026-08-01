@@ -92,7 +92,11 @@ function Library:OnKeybindChange(Fn)
 end;
 
 local AccentClock = 0;
+local AccentFrameTimer = 0;
 game:GetService("RunService").Heartbeat:Connect(function(Dt)
+	AccentFrameTimer = AccentFrameTimer + Dt;
+	if AccentFrameTimer < 0.033 then return end;
+	AccentFrameTimer = 0;
 	AccentClock = AccentClock + Dt * 0.8;
 	local Off = (AccentClock % 2) - 1;
 	local OffsetV = Vector2.new(Off, 0);
