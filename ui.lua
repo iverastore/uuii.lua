@@ -30,19 +30,19 @@ local Library = {
 
 local Palette = {
 	Default = {
-		Top = Color3.fromHex("0f0f0f");
-		Bottom = Color3.fromHex("141414");
-		ContentTop = Color3.fromHex("0c0c0c");
-		ContentBottom = Color3.fromHex("0e0e0e");
-		FooterTop = Color3.fromHex("0c0c0c");
-		FooterBottom = Color3.fromHex("080808");
+		Top = Color3.fromHex("1e1e1e");
+		Bottom = Color3.fromHex("181818");
+		ContentTop = Color3.fromHex("1a1a1a");
+		ContentBottom = Color3.fromHex("141414");
+		FooterTop = Color3.fromHex("1a1a1a");
+		FooterBottom = Color3.fromHex("1e1e1e");
 		Outline = Color3.fromHex("000000");
-		InnerOutline = Color3.fromHex("1e1e1e");
+		InnerOutline = Color3.fromHex("333333");
 		TitleTop = Color3.fromHex("e8e8e8");
 		TitleBottom = Color3.fromHex("808080");
 		TabActive = Color3.fromHex("c41e3a");
 		Accent = Color3.fromHex("c41e3a");
-		TabInactive = Color3.fromHex("707070");
+		TabInactive = Color3.fromHex("888888");
 	};
 };
 Library.Palette = Palette;
@@ -458,7 +458,7 @@ function Library:Tooltip(Inst, Text)
 			Parent           = Frame;
 			Size             = UDim2.new(0, 0, 0, 0);
 			AutomaticSize    = Enum.AutomaticSize.XY;
-			BackgroundColor3 = Color3.fromHex("1a1a1a");
+			BackgroundColor3 = Color3.fromHex("2a2a2a");
 			BorderSizePixel  = 0;
 		});
 		self:CreateInstance("UIPadding", {
@@ -469,7 +469,7 @@ function Library:Tooltip(Inst, Text)
 			Parent           = Gray;
 			Size             = UDim2.new(0, 0, 0, 0);
 			AutomaticSize    = Enum.AutomaticSize.XY;
-			BackgroundColor3 = Color3.fromHex("080808");
+			BackgroundColor3 = Color3.fromHex("1c1c1c");
 			BorderSizePixel  = 0;
 		});
 		self:CreateInstance("UIPadding", {
@@ -577,8 +577,8 @@ function Library:Window(Opts)
 		Parent   = Outer;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("0f0f0f"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("0a0a0a"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("2a2a2a"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 		});
 	});
 	self:CreateInstance("UIStroke", {
@@ -599,7 +599,7 @@ function Library:Window(Opts)
 	});
 	self:CreateInstance("UIStroke", {
 		Parent          = InnerOutline;
-		Color           = Color3.fromHex("1a1a1a");
+		Color           = Color3.fromHex("2a2a2a");
 		Thickness       = 1;
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
 		LineJoinMode    = Enum.LineJoinMode.Miter;
@@ -648,8 +648,8 @@ function Library:Window(Opts)
 		Parent   = Content;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("0c0c0c"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("080808"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("161616"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("1c1c1c"));
 		});
 	});
 
@@ -723,8 +723,8 @@ function Library:Window(Opts)
 			Parent   = Bg;
 			Rotation = 90;
 			Color    = NewColorSequence({
-				NewColorSequenceKeypoint(0, Color3.fromHex("111111"));
-				NewColorSequenceKeypoint(1, Color3.fromHex("0d0d0d"));
+				NewColorSequenceKeypoint(0, Color3.fromHex("1c1c1c"));
+				NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 			});
 		});
 
@@ -757,7 +757,7 @@ function Library:Window(Opts)
 			AnchorPoint            = Vector2.new(1, 0);
 			Position               = UDim2.new(1, 0, 0, 2);
 			Size                   = UDim2.new(0, 1, 1, -4);
-			BackgroundColor3       = Color3.fromHex("1a1a1a");
+			BackgroundColor3       = Color3.fromHex("2a2a2a");
 			BorderSizePixel        = 0;
 			BackgroundTransparency = 1;
 			ZIndex                 = 2;
@@ -771,7 +771,7 @@ function Library:Window(Opts)
 			BorderSizePixel        = 0;
 			Text                   = TabName;
 			TextSize               = 12;
-			TextColor3             = Color3.fromHex("606060");
+			TextColor3             = Color3.fromHex("888888");
 			TextXAlignment         = Enum.TextXAlignment.Center;
 			TextYAlignment         = Enum.TextYAlignment.Center;
 		});
@@ -890,8 +890,8 @@ function Library:Window(Opts)
 
 		local PageInfo = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 		local BgInfo   = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
-		local InactiveA, InactiveB = Color3.fromHex("111111"), Color3.fromHex("0d0d0d");
-		local ActiveA,   ActiveB   = Color3.fromHex("0c0c0c"), Color3.fromHex("0a0a0a");
+		local InactiveA, InactiveB = Color3.fromHex("1c1c1c"), Color3.fromHex("141414");
+		local ActiveA,   ActiveB   = Color3.fromHex("161616"), Color3.fromHex("141414");
 		local GradT      = TabRef.Active and 1 or 0;
 		local GradTarget = GradT;
 		local function ApplyGrad()
@@ -931,7 +931,7 @@ function Library:Window(Opts)
 				}):Play();
 				GradTarget = 0; GradT = 0; ApplyGrad();
 				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
-				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("606060") }):Play();
+				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("888888") }):Play();
 			end;
 		end;
 
@@ -968,11 +968,11 @@ function Library:Window(Opts)
 				Name = "SubTab_" .. Name;
 				Parent = self._SubTabBar;
 				Size = UDim2.new(1 / math.max(#self._SubTabs + 1, 1), 0, 1, 0);
-				BackgroundColor3 = Color3.fromHex("0a0a0a");
+				BackgroundColor3 = Color3.fromHex("141414");
 				BorderSizePixel = 0;
 				AutoButtonColor = false;
 				Text = Name;
-				TextColor3 = Color3.fromHex("505050");
+				TextColor3 = Color3.fromHex("777777");
 				TextSize = 11;
 			});
 			if ProggyCleanFont then SubBtn.FontFace = ProggyCleanFont end;
@@ -1040,7 +1040,7 @@ function Library:Window(Opts)
 					else
 						st.Left.Visible = false;
 						st.Right.Visible = false;
-						st.Btn.TextColor3 = Color3.fromHex("505050");
+						st.Btn.TextColor3 = Color3.fromHex("777777");
 						st.TopLine.BackgroundTransparency = 1;
 					end;
 				end;
@@ -1121,13 +1121,13 @@ function Library:Window(Opts)
 				Parent           = Sec;
 				Position         = UDim2.new(0, 7, 0, 0);
 				Size             = UDim2.new(0, 0, 0, 2);
-				BackgroundColor3 = Color3.fromHex("0c0c0c");
+				BackgroundColor3 = Color3.fromHex("161616");
 				BorderSizePixel  = 0;
 				ZIndex           = 6;
 			});
 
-			local GradTop    = Color3.fromHex("0c0c0c");
-			local GradBottom = Color3.fromHex("080808");
+			local GradTop    = Color3.fromHex("161616");
+			local GradBottom = Color3.fromHex("1c1c1c");
 			local function UpdateCoverColor()
 				local Ch = self.Page.Parent.AbsoluteSize.Y;
 				if Ch <= 0 then return end;
@@ -1197,7 +1197,7 @@ function Library:Window(Opts)
 				local Risk = Opts.Risk and string.lower(tostring(Opts.Risk))
 					or (Opts.Risky and "risky") or (Opts.Warning and "warning") or nil;
 				local OnColor  = Color3.fromHex("FFFFFF");
-				local OffColor = Color3.fromHex("606060");
+				local OffColor = Color3.fromHex("888888");
 				if Risk == "risky" or Risk == "danger" or Risk == "red" then
 					OnColor  = Color3.fromHex("FF8585");
 					OffColor = OnColor:Lerp(Color3.fromHex("4A4A4A"), 0.45);
@@ -1230,7 +1230,7 @@ function Library:Window(Opts)
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local BoxInside = Library:CreateInstance("Frame", {
@@ -1238,7 +1238,7 @@ function Library:Window(Opts)
 					Parent           = BoxGray;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("080808");
+					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 				});
 
@@ -1344,7 +1344,7 @@ function Library:Window(Opts)
 						Parent           = KBtn;
 						Position         = UDim2.new(0, 1, 0, 1);
 						Size             = UDim2.new(1, -2, 1, -2);
-						BackgroundColor3 = Color3.fromHex("1a1a1a");
+						BackgroundColor3 = Color3.fromHex("2a2a2a");
 						BorderSizePixel  = 0;
 					});
 					local KInside = Library:CreateInstance("Frame", {
@@ -1545,7 +1545,7 @@ function Library:Window(Opts)
 						Name              = "TogglePicker";
 						Parent            = Gui;
 						Size              = UDim2.new(0, 218, 0, 248);
-						BackgroundColor3  = Color3.fromHex("080808");
+						BackgroundColor3  = Color3.fromHex("1c1c1c");
 						BorderSizePixel   = 0;
 						Visible           = false;
 						GroupTransparency = 1;
@@ -1567,7 +1567,7 @@ function Library:Window(Opts)
 					});
 					local PickerInnerStroke = Library:CreateInstance("UIStroke", {
 						Parent          = PickerInner;
-						Color           = Color3.fromHex("1a1a1a");
+						Color           = Color3.fromHex("2a2a2a");
 						Thickness       = 1;
 						Transparency    = 1;
 						ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
@@ -1601,16 +1601,16 @@ function Library:Window(Opts)
 						BorderSizePixel        = 0;
 					});
 					local CpInactiveSeq = NewColorSequence({
-						NewColorSequenceKeypoint(0, Color3.fromHex("111111"));
-						NewColorSequenceKeypoint(1, Color3.fromHex("0d0d0d"));
+						NewColorSequenceKeypoint(0, Color3.fromHex("1c1c1c"));
+						NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 					});
 					local CpActiveSeq = NewColorSequence({
-						NewColorSequenceKeypoint(0, Color3.fromHex("0c0c0c"));
-						NewColorSequenceKeypoint(1, Color3.fromHex("0a0a0a"));
+						NewColorSequenceKeypoint(0, Color3.fromHex("161616"));
+						NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 					});
 					local CpAnimInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
-					local CpInactiveA, CpInactiveB = Color3.fromHex("111111"), Color3.fromHex("0d0d0d");
-					local CpActiveA,   CpActiveB   = Color3.fromHex("0c0c0c"), Color3.fromHex("0a0a0a");
+					local CpInactiveA, CpInactiveB = Color3.fromHex("1c1c1c"), Color3.fromHex("141414");
+					local CpActiveA,   CpActiveB   = Color3.fromHex("161616"), Color3.fromHex("141414");
 					local CpOutlineNames = { "TopBlack", "TopGray", "BottomBlack", "BottomGray", "LeftBlack", "LeftGray", "RightBlack", "RightGray" };
 					local ColorPage, AnimationsPanel;
 					local CpTabToken = 0;
@@ -1900,7 +1900,7 @@ function Library:Window(Opts)
 							Parent           = Box;
 							Position         = UDim2.new(0, 1, 0, 1);
 							Size             = UDim2.new(1, -2, 1, -2);
-							BackgroundColor3 = Color3.fromHex("1a1a1a");
+							BackgroundColor3 = Color3.fromHex("2a2a2a");
 							BorderSizePixel  = 0;
 						});
 						local Inside = Library:CreateInstance("Frame", {
@@ -1947,7 +1947,7 @@ function Library:Window(Opts)
 						Parent            = MainBg;
 						Position          = UDim2.new(0, 0, 0, 28);
 						Size              = UDim2.new(1, 0, 1, -28);
-						BackgroundColor3  = Color3.fromHex("080808");
+						BackgroundColor3  = Color3.fromHex("1c1c1c");
 						BorderSizePixel   = 0;
 						Visible           = false;
 						GroupTransparency = 1;
@@ -1982,7 +1982,7 @@ function Library:Window(Opts)
 					});
 					local ModeBoxGray = Library:CreateInstance("Frame", {
 						Parent = ModeBox; Position = UDim2.new(0, 1, 0, 1);
-						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1a1a1a"); BorderSizePixel = 0;
+						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0;
 					});
 					local ModeInside = Library:CreateInstance("Frame", {
 						Parent = ModeBoxGray; Position = UDim2.new(0, 1, 0, 1);
@@ -2029,11 +2029,11 @@ function Library:Window(Opts)
 					});
 					local ModePopupGray = Library:CreateInstance("Frame", {
 						Parent = ModePopup; Position = UDim2.new(0, 1, 0, 1);
-						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1a1a1a"); BorderSizePixel = 0; ZIndex = 60;
+						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0; ZIndex = 60;
 					});
 					local ModePopupInside = Library:CreateInstance("Frame", {
 						Parent = ModePopupGray; Position = UDim2.new(0, 1, 0, 1);
-						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("080808"); BorderSizePixel = 0; ZIndex = 61;
+						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1c1c1c"); BorderSizePixel = 0; ZIndex = 61;
 					});
 					Library:CreateInstance("UIListLayout", {
 						Parent = ModePopupInside; FillDirection = Enum.FillDirection.Vertical;
@@ -2104,7 +2104,7 @@ function Library:Window(Opts)
 					local SpeedVal = Library:CreateInstance("TextLabel", {
 						Parent = AnimationsPanel; AnchorPoint = Vector2.new(1, 0);
 						Position = UDim2.new(1, 0, 0, 42); Size = UDim2.new(0, 40, 0, 12);
-						BackgroundTransparency = 1; Text = "50%"; TextColor3 = Color3.fromHex("606060"); TextSize = 12;
+						BackgroundTransparency = 1; Text = "50%"; TextColor3 = Color3.fromHex("888888"); TextSize = 12;
 						TextXAlignment = Enum.TextXAlignment.Right;
 					}); FontIt(SpeedVal);
 					local SpTrack = Library:CreateInstance("TextButton", {
@@ -2114,11 +2114,11 @@ function Library:Window(Opts)
 					});
 					Library:CreateInstance("Frame", {
 						Parent = SpTrack; Position = UDim2.new(0, 1, 0, 1);
-						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1a1a1a"); BorderSizePixel = 0;
+						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0;
 					});
 					local SpInside = Library:CreateInstance("Frame", {
 						Parent = SpTrack:FindFirstChildOfClass("Frame"); Position = UDim2.new(0, 1, 0, 1);
-						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("080808"); BorderSizePixel = 0;
+						Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1c1c1c"); BorderSizePixel = 0;
 					});
 					local SpFill = Library:CreateInstance("Frame", {
 						Parent = SpInside; Position = UDim2.new(0, 1, 0, 1);
@@ -2355,7 +2355,7 @@ function Library:Window(Opts)
 					Size                   = UDim2.new(0, 40, 0, 14);
 					BackgroundTransparency = 1;
 					BorderSizePixel        = 0;
-					TextColor3             = Color3.fromHex("606060");
+					TextColor3             = Color3.fromHex("888888");
 					TextSize               = 12;
 					TextXAlignment         = Enum.TextXAlignment.Right;
 					TextYAlignment         = Enum.TextYAlignment.Center;
@@ -2381,14 +2381,14 @@ function Library:Window(Opts)
 					Parent           = Track;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local TrackInside = Library:CreateInstance("Frame", {
 					Parent           = TrackGray;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("080808");
+					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 				});
 
@@ -2515,7 +2515,7 @@ function Library:Window(Opts)
 						Parent           = Btn;
 						Position         = UDim2.new(0, 1, 0, 1);
 						Size             = UDim2.new(1, -2, 1, -2);
-						BackgroundColor3 = Color3.fromHex("1a1a1a");
+						BackgroundColor3 = Color3.fromHex("2a2a2a");
 						BorderSizePixel  = 0;
 					});
 					local BInside = Library:CreateInstance("Frame", {
@@ -2710,7 +2710,7 @@ function Library:Window(Opts)
 					Name              = "Picker_" .. Name;
 					Parent            = Gui;
 					Size              = UDim2.new(0, 218, 0, 248);
-					BackgroundColor3  = Color3.fromHex("080808");
+					BackgroundColor3  = Color3.fromHex("1c1c1c");
 					BorderSizePixel   = 0;
 					Visible           = false;
 					GroupTransparency = 1;
@@ -2734,7 +2734,7 @@ function Library:Window(Opts)
 				});
 				local PickerInnerStroke = Library:CreateInstance("UIStroke", {
 					Parent          = PickerInner;
-					Color           = Color3.fromHex("1a1a1a");
+					Color           = Color3.fromHex("2a2a2a");
 					Thickness       = 1;
 					Transparency    = 1;
 					ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
@@ -2775,17 +2775,17 @@ function Library:Window(Opts)
 				});
 
 				local CpInactiveSeq = NewColorSequence({
-					NewColorSequenceKeypoint(0, Color3.fromHex("111111"));
-					NewColorSequenceKeypoint(1, Color3.fromHex("0d0d0d"));
+					NewColorSequenceKeypoint(0, Color3.fromHex("1c1c1c"));
+					NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 				});
 				local CpActiveSeq = NewColorSequence({
-					NewColorSequenceKeypoint(0, Color3.fromHex("0c0c0c"));
-					NewColorSequenceKeypoint(1, Color3.fromHex("0a0a0a"));
+					NewColorSequenceKeypoint(0, Color3.fromHex("161616"));
+					NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 				});
 
 				local CpAnimInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
-				local CpInactiveA, CpInactiveB = Color3.fromHex("111111"), Color3.fromHex("0d0d0d");
-				local CpActiveA,   CpActiveB   = Color3.fromHex("0c0c0c"), Color3.fromHex("0a0a0a");
+				local CpInactiveA, CpInactiveB = Color3.fromHex("1c1c1c"), Color3.fromHex("141414");
+				local CpActiveA,   CpActiveB   = Color3.fromHex("161616"), Color3.fromHex("141414");
 				local CpOutlineNames = { "TopBlack", "TopGray", "BottomBlack", "BottomGray", "LeftBlack", "LeftGray", "RightBlack", "RightGray" };
 				local ColorPage, AnimationsPanel;
 				local CpTabToken = 0;
@@ -2936,7 +2936,7 @@ function Library:Window(Opts)
 					Parent            = MainBg;
 					Position          = UDim2.new(0, 0, 0, 28);
 					Size              = UDim2.new(1, 0, 1, -28);
-					BackgroundColor3  = Color3.fromHex("080808");
+					BackgroundColor3  = Color3.fromHex("1c1c1c");
 					BorderSizePixel   = 0;
 					Visible           = false;
 					GroupTransparency = 1;
@@ -2975,7 +2975,7 @@ function Library:Window(Opts)
 					Parent           = ModeBox;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local ModeInside = Library:CreateInstance("Frame", {
@@ -3044,7 +3044,7 @@ function Library:Window(Opts)
 					Parent           = ModePopup;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 					ZIndex           = 60;
 				});
@@ -3052,7 +3052,7 @@ function Library:Window(Opts)
 					Parent           = ModePopupGray;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("080808");
+					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 					ZIndex           = 61;
 				});
@@ -3140,7 +3140,7 @@ function Library:Window(Opts)
 					Size                   = UDim2.new(0, 40, 0, 12);
 					BackgroundTransparency = 1;
 					Text                   = "50%";
-					TextColor3             = Color3.fromHex("606060");
+					TextColor3             = Color3.fromHex("888888");
 					TextSize               = 12;
 					TextXAlignment         = Enum.TextXAlignment.Right;
 				}); FontIt(SpeedVal);
@@ -3155,11 +3155,11 @@ function Library:Window(Opts)
 				});
 				local SpGray = Library:CreateInstance("Frame", {
 					Parent = SpTrack; Position = UDim2.new(0, 1, 0, 1);
-					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1a1a1a"); BorderSizePixel = 0;
+					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0;
 				});
 				local SpInside = Library:CreateInstance("Frame", {
 					Parent = SpGray; Position = UDim2.new(0, 1, 0, 1);
-					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("080808"); BorderSizePixel = 0;
+					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1c1c1c"); BorderSizePixel = 0;
 				});
 				local SpFill = Library:CreateInstance("Frame", {
 					Parent           = SpInside;
@@ -3370,7 +3370,7 @@ function Library:Window(Opts)
 						Parent           = Box;
 						Position         = UDim2.new(0, 1, 0, 1);
 						Size             = UDim2.new(1, -2, 1, -2);
-						BackgroundColor3 = Color3.fromHex("1a1a1a");
+						BackgroundColor3 = Color3.fromHex("2a2a2a");
 						BorderSizePixel  = 0;
 					});
 					local Inside = Library:CreateInstance("Frame", {
@@ -3642,7 +3642,7 @@ function Library:Window(Opts)
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local BoxInside = Library:CreateInstance("Frame", {
@@ -3730,7 +3730,7 @@ function Library:Window(Opts)
 					Position         = UDim2.new(0, 0, 0, 0);
 					Size             = UDim2.new(1, 0, 0, 0);
 					AutomaticSize    = Enum.AutomaticSize.Y;
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 					ZIndex           = 50;
 				});
@@ -3746,7 +3746,7 @@ function Library:Window(Opts)
 					Position               = UDim2.new(0, 0, 0, 0);
 					Size                   = UDim2.new(1, 0, 0, 0);
 					AutomaticSize          = Enum.AutomaticSize.Y;
-					BackgroundColor3       = Color3.fromHex("080808");
+					BackgroundColor3       = Color3.fromHex("1c1c1c");
 					BorderSizePixel        = 0;
 					ZIndex                 = 50;
 				});
@@ -3808,7 +3808,7 @@ function Library:Window(Opts)
 							Name                   = "Option_" .. tostring(Opt);
 							Parent                 = PopupInside;
 							Size                   = UDim2.new(1, 0, 0, 14);
-							BackgroundColor3       = Color3.fromHex("080808");
+							BackgroundColor3       = Color3.fromHex("1c1c1c");
 							BorderSizePixel        = 0;
 							AutoButtonColor        = false;
 							Text                   = tostring(Opt);
@@ -3982,7 +3982,7 @@ function Library:Window(Opts)
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local BoxInside = Library:CreateInstance("Frame", {
@@ -4102,7 +4102,7 @@ function Library:Window(Opts)
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
 					Size             = UDim2.new(1, -2, 1, -2);
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
 				local BoxInside = Library:CreateInstance("Frame", {
@@ -4211,7 +4211,7 @@ function Library:Window(Opts)
 					Parent           = Popup;
 					Size             = UDim2.new(1, 0, 0, 0);
 					AutomaticSize    = Enum.AutomaticSize.Y;
-					BackgroundColor3 = Color3.fromHex("1a1a1a");
+					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 					ZIndex           = 50;
 				});
@@ -4226,7 +4226,7 @@ function Library:Window(Opts)
 					Parent           = PopupGray;
 					Size             = UDim2.new(1, 0, 0, 0);
 					AutomaticSize    = Enum.AutomaticSize.Y;
-					BackgroundColor3 = Color3.fromHex("080808");
+					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 					ZIndex           = 50;
 				});
@@ -4445,7 +4445,7 @@ function Library:Window(Opts)
 				});
 				local BoxGray = Library:CreateInstance("Frame", {
 					Parent = Box; Position = UDim2.new(0, 1, 0, 1);
-					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("1a1a1a"); BorderSizePixel = 0;
+					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0;
 				});
 				local BoxInside = Library:CreateInstance("Frame", {
 					Parent = BoxGray; Position = UDim2.new(0, 1, 0, 1);
@@ -4984,7 +4984,7 @@ function Library:KeybindList(Opts)
 		Parent   = Frame;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("111111"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("1c1c1c"));
 			NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 		});
 	});
@@ -5177,7 +5177,7 @@ function Library:Watermark(Opts)
 		Parent           = Frame;
 		Size             = UDim2.new(0, 0, 1, 0);
 		AutomaticSize    = Enum.AutomaticSize.X;
-		BackgroundColor3 = Color3.fromHex("1a1a1a");
+		BackgroundColor3 = Color3.fromHex("2a2a2a");
 		BorderSizePixel  = 0;
 	});
 	self:CreateInstance("UIPadding", {
@@ -5221,8 +5221,8 @@ function Library:Watermark(Opts)
 		Parent   = Inside;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("111111"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("0d0d0d"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("1c1c1c"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 		});
 	});
 	self:CreateInstance("UIPadding", {
@@ -5324,7 +5324,7 @@ function Library:Notify(Text, Time)
 		Parent           = Outer;
 		Position         = UDim2.new(0, 1, 0, 1);
 		Size             = UDim2.new(1, -2, 1, 0);
-		BackgroundColor3 = Color3.fromHex("1a1a1a");
+		BackgroundColor3 = Color3.fromHex("2a2a2a");
 		BorderSizePixel  = 0;
 	});
 	self:CreateInstance("UIPadding", {
