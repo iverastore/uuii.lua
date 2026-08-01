@@ -5464,18 +5464,19 @@ function Library:Notify(Text, Time)
 end;
 
 function Library:Unload()
-	self:Log("Unload requested");
 	if _AccentConn then _AccentConn:Disconnect(); _AccentConn = nil end;
 	for _, Conn in self.Connections do
-		if Conn ~= nil then
-			Conn:Disconnect();
-		end;
+		pcall(function() Conn:Disconnect() end);
 	end;
 	self.Connections = {};
 
 	local Win = self.CurrentlyOpen;
-	if typeof(Win) == "table" and typeof(Win.Gui) == "Instance" and Win.Gui.Parent then
-		Win.Gui:Destroy();
+	if Win then
+		pcall(function()
+			if Win.Gui and Win.Gui.Parent then
+				Win.Gui:Destroy();
+			end;
+		end);
 	end;
 	self.CurrentlyOpen = nil;
 
@@ -5495,8 +5496,13 @@ function Library:Unload()
 	self.Flags = {};
 	self.Toggles = {};
 	self.Options = {};
+	self.AccentParts = {};
+	self.AccentGradients = {};
+	self.AccentCallbacks = {};
+	self.Keybinds = {};
+	self.KeybindListeners = {};
+	self._ActiveDraggers = {};
 	getgenv().Library = nil;
-	self:Log("Unload complete");
 end;
 
 return Library;
