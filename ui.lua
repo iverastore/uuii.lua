@@ -18,6 +18,7 @@ local NewNumberSequenceKeypoint = NumberSequenceKeypoint.new;
 
 local Library = {
 	Flags = {};
+	SetFlags = {};
 	Toggles = {};
 	Options = {};
 	Connections = {};
@@ -89,6 +90,11 @@ function Library:OnKeybindChange(Fn)
 	if typeof(Fn) ~= "function" then return end;
 	table.insert(self.KeybindListeners, Fn);
 	Fn();
+end;
+
+function Library:RegisterFlag(Flag, Setter)
+	if not Flag or Flag == "" then return end;
+	self.SetFlags[Flag] = Setter;
 end;
 
 local AccentClock = 0;
@@ -2352,12 +2358,18 @@ function Library:Window(Opts)
 						end;
 					end);
 
+					Library:RegisterFlag(Flag, function(NewColor, NewAlpha)
+						if typeof(NewColor) == "Color3" then H, Sa, Va = Color3.toHSV(NewColor) end;
+						if NewAlpha then A = math.clamp(NewAlpha, 0, 1) end;
+						ApplyState();
+					end);
 					return self;
 				end;
 
 				if Opts.Dependency and typeof(Opts.Dependency.OnChange) == "function" then
 					Opts.Dependency:OnChange(function(S) Row.Visible = S end);
 				end;
+				Library:RegisterFlag(Flag, function(V) Obj:Set(V) end);
 				return Obj;
 			end;
 
@@ -2518,6 +2530,7 @@ function Library:Window(Opts)
 				local Obj = { Container = Container, Track = Track, Fill = Fill };
 				function Obj:Get() return Value end;
 				function Obj:Set(V) SetVal(tonumber(V) or Value) end;
+				Library:RegisterFlag(Flag, function(V) Obj:Set(V) end);
 				return Obj;
 			end;
 
@@ -3630,6 +3643,7 @@ function Library:Window(Opts)
 					if NewAlpha then A = math.clamp(NewAlpha, 0, 1) end;
 					ApplyState();
 				end;
+				Library:RegisterFlag(Flag, function(V, A2) CpObj:Set(V, A2) end);
 				return CpObj;
 			end;
 
@@ -3983,6 +3997,7 @@ function Library:Window(Opts)
 					BuildOptions();
 					ValLbl.Text = DisplayText();
 				end;
+				Library:RegisterFlag(Flag, function(V) Obj:Set(V) end);
 				return Obj;
 			end;
 
@@ -4092,6 +4107,7 @@ function Library:Window(Opts)
 				local Obj = { Container = Container, Box = Box, Input = Input };
 				function Obj:Get() return Input.Text end;
 				function Obj:Set(V) Commit(V, false) end;
+				Library:RegisterFlag(Flag, function(V) Obj:Set(V) end);
 				return Obj;
 			end;
 
@@ -4441,6 +4457,14 @@ function Library:Window(Opts)
 					Key = K;
 					Refresh();
 				end;
+				Library:RegisterFlag(Flag, function(V)
+					if typeof(V) == "EnumItem" then
+						Obj:SetKey(V);
+					elseif typeof(V) == "table" then
+						local K = V.key or V.Key;
+						if K and typeof(K) == "EnumItem" then Obj:SetKey(K) end;
+					end;
+				end);
 				return Obj;
 			end;
 
@@ -4596,6 +4620,7 @@ function Library:Window(Opts)
 					Options = typeof(Opts2) == "table" and Opts2 or {};
 					BuildOptions();
 				end;
+				Library:RegisterFlag(Flag, function(V) Obj:Set(V) end);
 				return Obj;
 			end;
 
@@ -5511,6 +5536,7 @@ function Library:Unload()
 	end;
 
 	self.Flags = {};
+	self.SetFlags = {};
 	self.Toggles = {};
 	self.Options = {};
 	self.AccentParts = {};
