@@ -1410,6 +1410,9 @@ do -- Elements
                 KeybindText.Text = "..."
 
                 Keybind.Connection = Library.AddConnection(UserInputService.InputBegan, function(Input)
+                    -- Ignore right-click during keybind selection (reserved for mode menu)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton2 then return end
+                    
                     Keybind.Set(Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode or Input.UserInputType)
                     Keybind.Value = true
 
@@ -1424,10 +1427,9 @@ do -- Elements
             end))
 
             -- Right-click mode selection menu
-            Library.AddConnection(UserInputService.InputBegan, LPH_NO_VIRTUALIZE(function(Input)
-                if Input.UserInputType ~= Enum.UserInputType.MouseButton2 then return end
-                if not Library.MouseOverFrame(KeybindOutline) then return end
+            Library.AddConnection(KeybindText.MouseButton2Down, LPH_NO_VIRTUALIZE(function()
                 if Library.MouseOverOtherWindow(Options.MainUI) then return end
+                if Keybind.SelectingKeybind then return end
 
                 -- Destroy existing mode list if open
                 if Keybind.ModeList then
@@ -1441,14 +1443,15 @@ do -- Elements
                 local Modes = {"Toggle", "Hold", "Always"}
                 local ModeMap = {["Toggle"] = "Toggle", ["Hold"] = "On Hold", ["Always"] = "Always"}
 
+                local mousePos = UserInputService:GetMouseLocation()
                 local ModeFrame = Library.CreateObject("Frame", {
                     Name = "ModeList",
-                    Position = UDim2_new(0, 0, 1, 2),
-                    Size = UDim2_new(1, 20, 0, #Modes * 18 + 4),
+                    Position = UDim2_new(0, mousePos.X, 0, mousePos.Y),
+                    Size = UDim2_new(0, 80, 0, #Modes * 18 + 4),
                     BackgroundColor3 = ThemeDefault.DarkContrast,
                     BorderSizePixel = 0,
                     ZIndex = 200,
-                    Parent = KeybindOutline
+                    Parent = UITable.ScreenGui
                 }); Library.AddTheme(ModeFrame, {BackgroundColor3 = "DarkContrast"})
 
                 Library.CreateObject("UIStroke", {
