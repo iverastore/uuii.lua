@@ -220,13 +220,13 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(140, 135, 180),--Color3_fromRGB(0, 156, 255),
-			SecondAccent = Color3_fromRGB(90, 85, 130),--Color3_fromRGB(17, 74, 138),
-			LightContrast = Color3_fromRGB(45, 45, 45),
-			DarkContrast = Color3_fromRGB(27, 27, 27),
-			Outline = Color3_fromRGB(0, 0, 0),
+			Accent = Color3_fromRGB(255, 255, 255),
+			SecondAccent = Color3_fromRGB(180, 180, 180),
+			LightContrast = Color3_fromRGB(22, 22, 22),
+			DarkContrast = Color3_fromRGB(14, 14, 14),
+			Outline = Color3_fromRGB(40, 40, 40),
 			TextColor = Color3_fromRGB(255, 255, 255),
-			TextDark = Color3_fromRGB(180, 180, 180),
+			TextDark = Color3_fromRGB(140, 140, 140),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
 		Presets = {
@@ -7106,6 +7106,13 @@ do
         end
     end)
 
+    -- Drag handle
+    local WMDrag = Library.CreateObject("TextButton", {
+        Name = "Drag", Text = "", BackgroundTransparency = 1,
+        Size = UDim2_new(1, 0, 1, 0), BorderSizePixel = 0, AutoButtonColor = false, Parent = WM
+    })
+    Library.Draggable(WM, WMDrag)
+
     function Library.SetWatermarkVisible(v) WM.Visible = v end
     Library.WatermarkFrame = WM
 end
@@ -7148,6 +7155,13 @@ do
     Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,4), PaddingRight = UDim_new(0,4), PaddingBottom = UDim_new(0,3), Parent = KLHolder})
 
     UITable.KeybindListUI = KL
+
+    -- Drag handle
+    local KLDrag = Library.CreateObject("TextButton", {
+        Name = "Drag", Text = "", BackgroundTransparency = 1,
+        Size = UDim2_new(1, 0, 0, 20), BorderSizePixel = 0, AutoButtonColor = false, Parent = KL
+    })
+    Library.Draggable(KL, KLDrag)
 
     function Library.SetKeybindListVisible(v) KL.Visible = v end
 end
@@ -7246,8 +7260,13 @@ do
     }); Library.AddTheme(THWeapon, {TextColor3 = "TextDark"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THWeapon})
 
-    -- Draggable
-    Library.Draggable(TH, TH)
+    -- Drag handle (invisible TextButton)
+    local THDrag = Library.CreateObject("TextButton", {
+        Name = "Drag", Text = "", BackgroundTransparency = 1,
+        Size = UDim2_new(1, 0, 0, 18), Position = UDim2_new(0, 0, 0, 0),
+        BorderSizePixel = 0, AutoButtonColor = false, Parent = TH
+    })
+    Library.Draggable(TH, THDrag)
 
     -- API
     local TargetHUDAPI = {Visible = false, Target = nil, Items = {Container = TH}}
