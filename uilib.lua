@@ -220,13 +220,13 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(255, 255, 255),
-			SecondAccent = Color3_fromRGB(200, 200, 200),
-			LightContrast = Color3_fromRGB(25, 25, 25),
-			DarkContrast = Color3_fromRGB(15, 15, 15),
-			Outline = Color3_fromRGB(40, 40, 40),
-			TextColor = Color3_fromRGB(255, 255, 255),
-			TextDark = Color3_fromRGB(140, 140, 140),
+			Accent = Color3_fromRGB(130, 100, 220),
+			SecondAccent = Color3_fromRGB(90, 60, 180),
+			LightContrast = Color3_fromRGB(30, 30, 30),
+			DarkContrast = Color3_fromRGB(20, 20, 20),
+			Outline = Color3_fromRGB(45, 45, 45),
+			TextColor = Color3_fromRGB(220, 220, 220),
+			TextDark = Color3_fromRGB(130, 130, 130),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
 		Presets = {},
@@ -293,37 +293,40 @@ do -- Files
             makefolder(`{Files.FontsPath}`);
         end;
 
-        --
 
-        for Name, Table in Files.Fonts do
-            if not Table or not Table.Link then continue; end;
+        task_spawn(function()
+            for Name, Table in Files.Fonts do
+                if not Table or not Table.Link then continue; end;
 
-            if not isfile(`{Files.FontsPath}\\{Name}.ttf`) then
-                writefile(`{Files.FontsPath}\\{Name}.ttf`, game:HttpGet(Table.Link));
-            end;
-            
-            if not isfile(`{Files.FontsPath}\\{Name}.font`) or --[[ExecutorName == "Zenith"]] true then
-                local Config = {
-                    name = Name,
-                    faces = {{
-                        name = "Regular",
-                        weight = 9e9,
-                        style = "normal",
-                        assetId = getcustomasset(`{Files.FontsPath}\\{Name}.ttf`)
-                    }}
-                };
+                if not isfile(`{Files.FontsPath}\\{Name}.ttf`) then
+                    pcall(function()
+                        writefile(`{Files.FontsPath}\\{Name}.ttf`, game:HttpGet(Table.Link));
+                    end)
+                end;
                 
-                writefile(`{Files.FontsPath}\\{Name}.font`, HttpService:JSONEncode(Config));
-            end;
+                if isfile(`{Files.FontsPath}\\{Name}.ttf`) and (not isfile(`{Files.FontsPath}\\{Name}.font`) or true) then
+                    local Config = {
+                        name = Name,
+                        faces = {{
+                            name = "Regular",
+                            weight = 9e9,
+                            style = "normal",
+                            assetId = getcustomasset(`{Files.FontsPath}\\{Name}.ttf`)
+                        }}
+                    };
+                    
+                    writefile(`{Files.FontsPath}\\{Name}.font`, HttpService:JSONEncode(Config));
+                end;
 
-            for _, FontPath in listfiles(Files.FontsPath) do
-                local Name = string_match(FontPath, `{Files.FontsPath}\\(.+)%.font`);
+                for _, FontPath in listfiles(Files.FontsPath) do
+                    local Name = string_match(FontPath, `{Files.FontsPath}\\(.+)%.font`);
 
-                if Name then
-                    Files.Fonts.Loaded[Name] = Font_new(getcustomasset(FontPath), Enum.FontWeight.Regular);
+                    if Name then
+                        Files.Fonts.Loaded[Name] = Font_new(getcustomasset(FontPath), Enum.FontWeight.Regular);
+                    end;
                 end;
             end;
-        end;
+        end)
     end;
 end
 
@@ -331,7 +334,7 @@ do -- Functions
 	function Library.Error(Flag, Extra)
 		if Library.Errors[Flag] then return end
 		local LPH_LINE = nil
-		local ErrorMessage = string_format("âš ï¸ An error has occured:\n%s\n%s\nðŸ“ Trace: %s / %s", Flag, Extra or "", debug.traceback(), LPH_LINE or "No Line")
+		local ErrorMessage = string_format("âš ï¸ An error has occured:\n%s\n%s\nðŸ“ Trace: %s / %s", Flag, Extra or "", debug.traceback(), LPH_LINE or "No Line")
 
 		if Library.AddOutput then
 			Library.AddOutput(ErrorMessage, "Error")
@@ -421,7 +424,7 @@ do -- Functions
             table_insert(Table, Descendant)
         end
 
-        table_insert(Table, Descendant)
+        table_insert(Table, Object)
 
         return Table
     end
@@ -647,11 +650,11 @@ do -- Functions
 				end
 
                 if Object.Parent == UITable.ExtrasScreenGui then
-                    UITable.ExtrasScreenGui.DisplayOrder = 20000001
-                    UITable.ScreenGui.DisplayOrder = 20000000
+                    UITable.ExtrasScreenGui.DisplayOrder = 20000002
+                    UITable.ScreenGui.DisplayOrder = 20000001
                 elseif Object.Parent == UITable.ScreenGui then
                     UITable.ScreenGui.DisplayOrder = 20000001
-                    UITable.ExtrasScreenGui.DisplayOrder = 20000000
+                    UITable.ExtrasScreenGui.DisplayOrder = 20000002
                 end
 
 				UITable.MainZIndex = Object.ZIndex + 2
@@ -734,11 +737,11 @@ do -- Functions
 			ObjectPosition = Object.Position
 
 			if Object.Parent == UITable.ExtrasScreenGui then
-				UITable.ExtrasScreenGui.DisplayOrder = 20000001
-				UITable.ScreenGui.DisplayOrder = 20000000
+				UITable.ExtrasScreenGui.DisplayOrder = 20000002
+				UITable.ScreenGui.DisplayOrder = 20000001
 			elseif Object.Parent == UITable.ScreenGui then
 				UITable.ScreenGui.DisplayOrder = 20000001
-				UITable.ExtrasScreenGui.DisplayOrder = 20000000
+				UITable.ExtrasScreenGui.DisplayOrder = 20000002
 			end
 
 			UITable.MainZIndex += 1
@@ -887,7 +890,6 @@ do -- Functions
     end
 
     function Library.Notify(optsOrSelf, optsOrDur, durArg)
-        -- Handles both Library.Notify({Message=...}) and Library:Notify("msg", dur)
         local msg, delay
         if type(optsOrSelf) == "table" and optsOrSelf.Message then
             msg = optsOrSelf.Message
@@ -1113,7 +1115,7 @@ UITable.ExtrasScreenGui = Library.CreateObject("ScreenGui", {
 	ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	ResetOnSpawn = false,
-	DisplayOrder = 20000000,
+	DisplayOrder = 20000002,
 	IgnoreGuiInset = true,
 	Parent = gethui()
 })
@@ -1209,7 +1211,6 @@ do -- Elements
                 
                 if typeof(Key) == "boolean" then return end
                 if typeof(Key) == "table" then
-                    --Library.RemoveKeybindFrame(Options.Toggle.GetName(), Options.Toggle.GetSection())
                     ActualKey = Key[1]
                     Keybind.SetMode(Key[2])
                 else
@@ -1262,7 +1263,6 @@ do -- Elements
                 end
                 
                 if string_lower(Keybind.Keybind) == "none" then
-                    --Library.RemoveKeybindFrame(Options.Toggle.GetName(), Options.Toggle.GetSection())
                 end
             end
 
@@ -1278,19 +1278,15 @@ do -- Elements
                         Keybind.Value = true
                         
                         if Options.Toggle.Value then
-                            --Library.AddKeybindFrame(Options.Toggle.GetName(), Keybind.Keybind, Options.Toggle.GetSection())
                         end
                     else
-                        --Library.UpdateKeybindFrame(Options.Toggle.GetName(), Options.Toggle.GetSection(), Keybind.Keybind)
                     end
                 elseif Mode == "Toggle" then
                     if Keybind.Value then
-                        --Library.UpdateKeybindFrame(Options.Toggle.GetName(), Options.Toggle.GetSection(), Keybind.Keybind)
                     end
                 elseif Mode == "On Hold" then
                     Keybind.Value = false
                     
-                    --Library.RemoveKeybindFrame(Options.Toggle.GetName(), Options.Toggle.GetSection())
                 end
             end
 
@@ -1306,7 +1302,6 @@ do -- Elements
                 if Bool ~= nil then
                     Keybind.Value = Bool
                 else
-                    -- Sync with parent toggle's actual state for correct toggling
                     if Options.Toggle and Options.Toggle.Value ~= nil then
                         Keybind.Value = not Options.Toggle.Value
                     else
@@ -1316,13 +1311,10 @@ do -- Elements
 
                 if not Options.HideFromList then
                     if Keybind.Value then
-                        --Library.AddKeybindFrame(Keybind.Text ~= "" and Keybind.Text or Options.Toggle.GetName(), Keybind.Keybind, Options.Toggle.GetSection())
                     else
-                        --Library.RemoveKeybindFrame(Keybind.Text ~= "" and Keybind.Text or Options.Toggle.GetName(), Options.Toggle.GetSection())
                     end
                 end
 
-                -- Actually toggle the parent Toggle UI to update its state and fire callback
                 if Options.Toggle and Options.Toggle.ToggleUI then
                     Options.Toggle.ToggleUI(Keybind.Value)
                 else
@@ -1405,7 +1397,6 @@ do -- Elements
                 KeybindText.Text = "..."
 
                 Keybind.Connection = Library.AddConnection(UserInputService.InputBegan, function(Input)
-                    -- Ignore right-click during keybind selection (reserved for mode menu)
                     if Input.UserInputType == Enum.UserInputType.MouseButton2 then return end
                     
                     Keybind.Set(Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode or Input.UserInputType)
@@ -1421,12 +1412,10 @@ do -- Elements
                 end)
             end))
 
-            -- Right-click mode selection menu
             Library.AddConnection(KeybindText.MouseButton2Down, LPH_NO_VIRTUALIZE(function()
                 if Library.MouseOverOtherWindow(Options.MainUI) then return end
                 if Keybind.SelectingKeybind then return end
 
-                -- Destroy existing mode list if open
                 if Keybind.ModeList then
                     local idx = table_find(UITable.ModeLists, Keybind.ModeList)
                     if idx then table_remove(UITable.ModeLists, idx) end
@@ -1487,7 +1476,6 @@ do -- Elements
 
                     Library.AddConnection(ModeBtn.MouseButton1Click, function()
                         Keybind.SetMode(ModeMap[modeName])
-                        -- Close the menu
                         if Keybind.ModeList then
                             local idx = table_find(UITable.ModeLists, Keybind.ModeList)
                             if idx then table_remove(UITable.ModeLists, idx) end
@@ -1497,7 +1485,6 @@ do -- Elements
                     end)
                 end
 
-                -- Close on click outside
                 task_delay(0.1, function()
                     local closeConn
                     closeConn = Library.AddConnection(UserInputService.InputBegan, function(Input)
@@ -1972,9 +1959,6 @@ do -- Elements
             function Button.SetVisible(Bool)
                 Button.MouseLeave()
                 ButtonOutline.ZIndex = Bool and 3 or 0
-                --Library.TweenObject(ButtonOutline, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-                --Library.TweenDescendants(Bool, Library.GetAllObjects(ButtonOutline))
-                --Library.TweenObject(ButtonOutline, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and UDim2_new(1, 0, 0, 18) or UDim2_new(1, 0, 0, -4)})
                 ButtonOutline.Visible = Bool
 
                 return Button
@@ -2245,9 +2229,6 @@ do -- Elements
             function TextBox.SetVisible(Bool)
                 TextBox.MouseLeave()
                 TextBoxOutline.ZIndex = Bool and 3 or 0
-                --Library.TweenObject(TextBoxOutline, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-                --Library.TweenDescendants(Bool, Library.GetAllObjects(TextBoxOutline))
-                --Library.TweenObject(TextBoxOutline, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and UDim2_new(1, 0, 0, 18) or UDim2_new(1, 0, 0, -4)})
                 TextBoxOutline.Visible = Bool
 
                 return TextBox
@@ -2498,9 +2479,6 @@ do -- Elements
         do -- Functions
             function List.SetVisible(Bool)
                 ListTemplate.ZIndex = Bool and 3 or 0
-                --Library.TweenObject(ListTemplate, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-                --Tween.TweenDescendants(Bool, Library.GetAllObjects(ListTemplate))
-                --Library.TweenObject(ListTemplate, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and Options.Size or UDim2_new(Options.Size.X.Scale, Options.Size.X.Offset, 0, -4)})
                 ListTemplate.Visible = false
 
                 return List
@@ -2947,11 +2925,7 @@ do -- Elements
 				Toggle.MouseLeave()
 				ToggleMain_2.ZIndex = Bool and 3 or 0
 				ExtrasHolder_2.ZIndex = Bool and 3 or 0
-				--Library.TweenObject(ToggleMain_2, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-				--Library.TweenDescendants(Bool, Library.GetAllObjects(ToggleMain_2))
                 ToggleMain_2.Visible = Bool
-                --Library.TweenObject(ToggleMain_2, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and UDim2_new(1, 0, 0, 14) or UDim2_new(1, 0, 0, -4)})
-				--Library.TweenObject(ExtrasHolder_2, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and UDim2_new(1, 0, 0, 14) or UDim2_new(1, 0, 0, -4)})
 				
 				return Toggle
 			end
@@ -3560,9 +3534,6 @@ do -- Elements
             function Slider.SetVisible(Bool)
                 Slider.MouseLeave()
                 SliderMain.ZIndex = Bool and 3 or 0
-                --Library.TweenObject(SliderMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-                --Library.FadeDescendants(Bool, Library.GetAllObjects(SliderMain))
-                --Library.TweenObject(SliderMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and SliderSize or UDim2_new(1, 0, 0, -4)})
                 SliderMain.Visible = Bool
 
                 return Slider
@@ -4012,25 +3983,17 @@ do -- Elements
                 end
 
                 if Fast then
-                    --DropdownMain.GroupTransparency = Bool and 0 or 1
                     DropdownMain.Size = Bool and DropdownSize or UDim2_new(1, 0, 0, -4)
 
                     if Bool == false then
                         DropdownMain.Visible = false
                     end
                 else
-                    --Library.TweenObject(DropdownMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
-                    --Library.FadeDescendants(Bool, Library.GetAllObjects(DropdownMain))
                     DropdownMain.Visible = Bool
                     if Bool == false then
                         DropdownMain.Visible = false
                     end
 
-                    --[[Library.TweenObject(DropdownMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and DropdownSize or UDim2_new(1, 0, 0, -4)}, function()
-                        if Bool == false then
-                            DropdownMain.Visible = false
-                        end
-                    end)]]
                 end
             
                 if Bool == false and Dropdown.Open then
@@ -4742,14 +4705,12 @@ do -- Elements
                 end
 
                 if Fast then
-                    --MultiBoxMain.GroupTransparency = Bool and 0 or 1
                     MultiBoxMain.Size = Bool and MultiBoxSize or UDim2_new(1, 0, 0, -4)
 
                     if Bool == false then
                         MultiBoxMain.Visible = false
                     end
                 else
-                    --Library.TweenObject(MultiBoxMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {GroupTransparency = Bool and 0 or 1})
                     Library.FadeDescendants(Bool, Library.GetAllObjects(MultiBoxMain))
                     Library.TweenObject(MultiBoxMain, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {Size = Bool and MultiBoxSize or UDim2_new(1, 0, 0, -4)}, function()
                         if Bool == false then
@@ -6127,8 +6088,8 @@ do -- Elements
                         Title.Text = ColorPickerTable.Name
                         Dropdown.SetVisible(Library.DictionaryLength(ColorPickerTable.Modes) > 0, true)
                         Dropdown.UpdateName(ColorPickerName)
-                        UITable.ExtrasScreenGui.DisplayOrder = 20000001
-                        UITable.ScreenGui.DisplayOrder = 20000000
+                        UITable.ExtrasScreenGui.DisplayOrder = 20000002
+                        UITable.ScreenGui.DisplayOrder = 20000001
                         ColorPicker.ZIndex = UITable.MainZIndex + UITable.DropdownZIndex + 1
                         Table.Enabled = Visible
                         
@@ -6322,7 +6283,11 @@ do -- Elements
             end
 
 			function Library.ToggleMenu(Bool)
-				Window.Visible = Bool or not Window.Visible
+				if Bool ~= nil then
+					Window.Visible = Bool
+				else
+					Window.Visible = not Window.Visible
+				end
 				
 				if Window.Visible == true then
 					Holder_7.Visible = true
@@ -6339,8 +6304,6 @@ do -- Elements
 				local InitTime = string_format("%.2f", os_clock() - UITable.InitTime)
 				local Message = string_format("Welcome. Successfully loaded in %s seconds", string_format("%.2f", InitTime))
 
-				--Library.Notify({Message = Message, ColoredTexts = {[string_format("%s seconds", InitTime)] = ThemeTable.Default.Accent}, Sound = "rbxassetid://18886652611", Delay = 5, Type = "Success"})
-				--Window.CreateKeybindMode()
 
 				Library.AddConnection(Camera:GetPropertyChangedSignal("ViewportSize"), LPH_NO_VIRTUALIZE(function()
 					Viewport = Camera.ViewportSize
@@ -6366,7 +6329,6 @@ do -- Elements
 					pcall(function() Object[1]:Destroy() end)
 				end
 
-				-- Destroy the ScreenGuis directly
 				pcall(function()
 					if UITable.ScreenGui then UITable.ScreenGui:Destroy() end
 				end)
@@ -6374,7 +6336,6 @@ do -- Elements
 					if UITable.ExtrasScreenGui then UITable.ExtrasScreenGui:Destroy() end
 				end)
 
-				-- Clear library reference
 				getgenv().Library = nil
 			end
 		end
@@ -6434,9 +6395,9 @@ do -- Elements
 					BorderColor3 = Color3_fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					AutomaticSize = Enum.AutomaticSize.Y,
-					BackgroundColor3 = ThemeDefault.Accent,
+					BackgroundColor3 = ThemeDefault.Outline,
 					Parent = SectionOutline_2
-				}); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Accent" })
+				}); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Outline" })
 
 				local SectionInline_2 = Library.CreateObject("Frame", {
 					Size = UDim2_new(1, -2, 1, -2),
@@ -7190,14 +7151,17 @@ end
 DefaultThemes = Library.GetTableIndexes(ThemeTable.Presets, true)
 Library.UpdateThemeList()
 
+
+
+
 do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
         Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
 
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM})
+    local WMStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM}); Library.AddTheme(WMStroke, {Color = "Outline"})
 
     local WMAccent = Library.CreateObject("Frame", {
         Name = "Accent", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
@@ -7230,7 +7194,6 @@ do
         end
     end)
 
-    -- Drag handle
     local WMDrag = Library.CreateObject("TextButton", {
         Name = "Drag", Text = "", BackgroundTransparency = 1,
         Size = UDim2_new(1, 0, 1, 0), BorderSizePixel = 0, AutoButtonColor = false, Parent = WM
@@ -7246,9 +7209,9 @@ do
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
         Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
         AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL})
+    local KLStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL}); Library.AddTheme(KLStroke, {Color = "Outline"})
 
     local KLAccent = Library.CreateObject("Frame", {
         Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
@@ -7277,7 +7240,6 @@ do
 
     UITable.KeybindListUI = KL
 
-    -- Drag handle
     local KLDrag = Library.CreateObject("TextButton", {
         Name = "Drag", Text = "", BackgroundTransparency = 1,
         Size = UDim2_new(1, 0, 0, 20), BorderSizePixel = 0, AutoButtonColor = false, Parent = KL
@@ -7292,11 +7254,10 @@ do
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
         Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
         BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
-        Visible = false, Parent = UITable.ScreenGui
+        Visible = false, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH})
+    local THStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH}); Library.AddTheme(THStroke, {Color = "Outline"})
 
-    -- Top accent gradient line
     local THAccent = Library.CreateObject("Frame", {
         Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
         BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = TH
@@ -7306,14 +7267,12 @@ do
         Parent = THAccent
     })
 
-    -- Inner background
     local THInner = Library.CreateObject("Frame", {
         Name = "Inner", Position = UDim2_new(0, 1, 0, 2),
         Size = UDim2_new(1, -2, 1, -3), BackgroundColor3 = ThemeDefault.DarkContrast,
         BorderSizePixel = 0, BackgroundTransparency = 1, Parent = TH
     })
 
-    -- Avatar
     local THAvatar = Library.CreateObject("ImageLabel", {
         Name = "Avatar", BackgroundColor3 = ThemeDefault.LightContrast,
         BorderSizePixel = 0, Position = UDim2_new(0, 6, 0, 6),
@@ -7321,7 +7280,6 @@ do
     }); Library.AddTheme(THAvatar, {BackgroundColor3 = "LightContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THAvatar})
 
-    -- Name
     local THName = Library.CreateObject("TextLabel", {
         FontFace = UITable.Font, Text = "Target",
         TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
@@ -7330,14 +7288,12 @@ do
     }); Library.AddTheme(THName, {TextColor3 = "TextColor"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THName})
 
-    -- HP Bar background
     local THHPBg = Library.CreateObject("Frame", {
         BackgroundColor3 = ThemeDefault.LightContrast, BorderSizePixel = 0,
         Position = UDim2_new(0, 62, 0, 22), Size = UDim2_new(1, -68, 0, 12), Parent = THInner
     }); Library.AddTheme(THHPBg, {BackgroundColor3 = "LightContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THHPBg})
 
-    -- HP Bar fill with gradient
     local THHPBar = Library.CreateObject("Frame", {
         BackgroundColor3 = Color3_fromRGB(255,255,255), BorderSizePixel = 0,
         Size = UDim2_new(1, 0, 1, 0), Parent = THHPBg
@@ -7350,7 +7306,6 @@ do
         Parent = THHPBar
     })
 
-    -- HP Text
     local THHPText = Library.CreateObject("TextLabel", {
         FontFace = UITable.Font, Text = "100 / 100",
         TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize - 1,
@@ -7359,7 +7314,6 @@ do
     }); Library.AddTheme(THHPText, {TextColor3 = "TextColor"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THHPText})
 
-    -- Distance text
     local THDist = Library.CreateObject("TextLabel", {
         FontFace = UITable.Font, Text = "0m",
         TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
@@ -7369,7 +7323,6 @@ do
     }); Library.AddTheme(THDist, {TextColor3 = "TextDark"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THDist})
 
-    -- Weapon text
     local THWeapon = Library.CreateObject("TextLabel", {
         FontFace = UITable.Font, Text = "",
         TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
@@ -7378,7 +7331,6 @@ do
     }); Library.AddTheme(THWeapon, {TextColor3 = "TextDark"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THWeapon})
 
-    -- Drag handle (invisible TextButton)
     local THDrag = Library.CreateObject("TextButton", {
         Name = "Drag", Text = "", BackgroundTransparency = 1,
         Size = UDim2_new(1, 0, 0, 18), Position = UDim2_new(0, 0, 0, 0),
@@ -7386,7 +7338,6 @@ do
     })
     Library.Draggable(TH, THDrag)
 
-    -- API
     local TargetHUDAPI = {Visible = false, Target = nil, Items = {Container = TH}}
 
     function TargetHUDAPI:SetVisibility(v)
@@ -7425,14 +7376,12 @@ do
         local pct = math_clamp(hum.Health / math_max(hum.MaxHealth, 1), 0, 1)
         Library.TweenObject(THHPBar, TweenInfo_new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2_new(pct, 0, 1, 0)})
         THHPText.Text = string_format("%d / %d", math_floor(hum.Health), math_floor(hum.MaxHealth))
-        -- Distance
         local myChar = Client.Character
         local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if myHrp and hrp then
             THDist.Text = string_format("%dm", math_floor((myHrp.Position - hrp.Position).Magnitude))
         end
-        -- Weapon
         local tool = char:FindFirstChildOfClass("Tool")
         THWeapon.Text = tool and tool.Name or ""
     end
@@ -7443,10 +7392,10 @@ do
 end
 
 function Library.CreateSubTabs(ParentTab, SubTabNames)
+
     local holder = ParentTab.Holder
     if not holder then return {} end
 
-    -- Create subtab navigation bar at top of tab content
     local SubNav = Library.CreateObject("Frame", {
         Name = "SubNav", BackgroundColor3 = ThemeDefault.DarkContrast,
         BorderSizePixel = 0, Size = UDim2_new(1, 0, 0, 22),
@@ -7459,8 +7408,6 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
         Parent = SubNav
     })
 
-    -- Hide existing content (parent tab's default Left/Right columns) since subtabs replace them
-    -- Also remove the horizontal UIListLayout that would conflict with vertical subtab layout
     for _, child in holder:GetChildren() do
         if child ~= SubNav then
             if child:IsA("UIListLayout") then
@@ -7468,7 +7415,6 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
             elseif child:IsA("UIFlexItem") then
                 child:Destroy()
             elseif child:IsA("UIPadding") then
-                -- Remove top padding so subtab bar is flush below tab bar
                 child.PaddingTop = UDim_new(0, 0)
                 child.PaddingLeft = UDim_new(0, 0)
                 child.PaddingRight = UDim_new(0, 0)
@@ -7483,7 +7429,6 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
     local activeSubTab = nil
 
     for i, name in ipairs(SubTabNames) do
-        -- Create button for each subtab
         local btn = Library.CreateObject("TextButton", {
             Name = name, FontFace = UITable.Font, Text = name,
             TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize,
@@ -7491,7 +7436,6 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
             BorderSizePixel = 0, AutoButtonColor = false, Parent = SubNav
         }); Library.AddTheme(btn, {TextColor3 = "TextDark"})
 
-        -- Create holder frame for subtab content (left + right columns)
         local subHolder = Library.CreateObject("Frame", {
             Name = name .. "_Holder", BackgroundTransparency = 1,
             Position = UDim2_new(0, 0, 0, 22), Size = UDim2_new(1, 0, 1, -22),
@@ -7526,15 +7470,12 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
 
         subHolders[name] = {holder = subHolder, left = subLeft, right = subRight, btn = btn}
 
-        -- Click handler
         Library.AddConnection(btn.MouseButton1Click, function()
             if activeSubTab == name then return end
-            -- Deactivate current
             if activeSubTab and subHolders[activeSubTab] then
                 subHolders[activeSubTab].holder.Visible = false
                 Library.TweenObject(subHolders[activeSubTab].btn, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {TextColor3 = ThemeDefault.TextDark})
             end
-            -- Activate new
             activeSubTab = name
             subHolders[name].holder.Visible = true
             Library.TweenObject(btn, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {TextColor3 = ThemeDefault.TextColor})
@@ -7546,20 +7487,16 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
         end
     end
 
-    -- Return section creators for each subtab
-    -- Each subtab entry has a .Section(opts) function that creates proper sections
     local result = {}
     for name, data in pairs(subHolders) do
         local subTabWrapper = {}
 
-        -- Section function creates a proper section inside this subtab
         function subTabWrapper.Section(opts)
             opts = opts or {}
             local side = opts.Side or "Left"
             if side == 1 then side = "Left" elseif side == 2 then side = "Right" end
             local parent = side == "Right" and data.right or data.left
 
-            -- Use the same Section construction as Window.Section but with our subtab parent
             local Section = {
                 Elements = {},
             }
@@ -7595,9 +7532,9 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
                 BorderColor3 = Color3_fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = ThemeDefault.Accent,
+                BackgroundColor3 = ThemeDefault.Outline,
                 Parent = SectionOutline_2
-            }); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Accent" })
+            }); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Outline" })
 
             local SectionInline_2 = Library.CreateObject("Frame", {
                 Size = UDim2_new(1, -2, 1, -2),
