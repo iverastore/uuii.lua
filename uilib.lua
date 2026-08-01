@@ -153,9 +153,9 @@ getgenv().Library = {
 		UnnamedFlags = 0,
 		RainbowHue = 0,
 		BreatheValue = 0,
-		TweenSpeed = 0.1,
-		TweenEasingStyle = Enum.EasingStyle.Quad,
-		DefaultTween = TweenInfo_new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		TweenSpeed = 0.14,
+		TweenEasingStyle = Enum.EasingStyle.Quint,
+		DefaultTween = TweenInfo_new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
 		KeybindTexts = {},
 		ListObjects = {},
 		Dropdowns = {},
@@ -220,13 +220,13 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(130, 100, 220),
-			SecondAccent = Color3_fromRGB(90, 60, 180),
-			LightContrast = Color3_fromRGB(30, 30, 30),
-			DarkContrast = Color3_fromRGB(20, 20, 20),
-			Outline = Color3_fromRGB(45, 45, 45),
-			TextColor = Color3_fromRGB(220, 220, 220),
-			TextDark = Color3_fromRGB(130, 130, 130),
+			Accent = Color3_fromRGB(114, 137, 218),
+			SecondAccent = Color3_fromRGB(78, 93, 148),
+			LightContrast = Color3_fromRGB(24, 24, 28),
+			DarkContrast = Color3_fromRGB(18, 18, 21),
+			Outline = Color3_fromRGB(36, 36, 40),
+			TextColor = Color3_fromRGB(210, 210, 215),
+			TextDark = Color3_fromRGB(110, 110, 120),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
 		Presets = {},
@@ -5218,11 +5218,11 @@ do -- Elements
 			FontFace = LibraryFont,
 			TextColor3 = ThemeDefault.TextColor,
 			BorderColor3 = Color3_fromRGB(0, 0, 0),
-			Text = `{Options.Name} - {UITable.ScriptBuild}`,
+			Text = Options.Name,
 			Name = "Title",
 			Size = UDim2_new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
-			TextXAlignment = Enum.TextXAlignment.Left,
+			TextXAlignment = Enum.TextXAlignment.Center,
 			BorderSizePixel = 0,
 			RichText = true,
 			TextSize = LibraryFontSize,
@@ -5237,7 +5237,7 @@ do -- Elements
 
 		local UIPadding_14 = Library.CreateObject("UIPadding", {
 			PaddingBottom = UDim.new(0, 3),
-			PaddingLeft = UDim.new(0, 7),
+			PaddingLeft = UDim.new(0, 0),
 			Parent = Title
 		})
 
@@ -6293,7 +6293,7 @@ do -- Elements
 					Holder_7.Visible = true
 				end
 
-				Library.TweenObject(Holder_7, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle), {GroupTransparency = Window.Visible and 0 or 1}, function()
+				Library.TweenObject(Holder_7, TweenInfo_new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {GroupTransparency = Window.Visible and 0 or 1}, function()
 					if Window.Visible == false then
 						Holder_7.Visible = false
 					end
@@ -6301,16 +6301,10 @@ do -- Elements
 			end
 			
 			function Library.Init()
-				local InitTime = string_format("%.2f", os_clock() - UITable.InitTime)
-				local Message = string_format("Welcome. Successfully loaded in %s seconds", string_format("%.2f", InitTime))
-
-
 				Library.AddConnection(Camera:GetPropertyChangedSignal("ViewportSize"), LPH_NO_VIRTUALIZE(function()
 					Viewport = Camera.ViewportSize
 				end))
 
-                Holder_7.Position = UDim2_fromOffset((Viewport.X / 2) - (Holder_7.AbsoluteSize.X / 2), (Viewport.Y / 2) - (Holder_7.AbsoluteSize.Y / 2))
-                Window.CreateColorPicker()
                 Library.GetAutoloadConfig()
 			end
 
@@ -6395,20 +6389,20 @@ do -- Elements
 					BorderColor3 = Color3_fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					AutomaticSize = Enum.AutomaticSize.Y,
-					BackgroundColor3 = ThemeDefault.Outline,
+					BackgroundColor3 = ThemeDefault.LightContrast,
 					Parent = SectionOutline_2
-				}); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Outline" })
+				}); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "LightContrast" })
 
 				local SectionInline_2 = Library.CreateObject("Frame", {
-					Size = UDim2_new(1, -2, 1, -2),
+					Size = UDim2_new(1, 0, 1, 0),
 					Name = "SectionInline_2",
-					Position = UDim2_new(0, 1, 0, 1),
+					Position = UDim2_new(0, 0, 0, 0),
 					BorderColor3 = Color3_fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					AutomaticSize = Enum.AutomaticSize.Y,
-					BackgroundColor3 = ThemeDefault.Outline,
+					BackgroundColor3 = ThemeDefault.LightContrast,
 					Parent = SectionAccent_2
-				}); Library.AddTheme(SectionInline_2, { BackgroundColor3 = "Outline" })
+				}); Library.AddTheme(SectionInline_2, { BackgroundColor3 = "LightContrast" })
 
 				local UIPadding_61 = Library.CreateObject("UIPadding", {
 					PaddingBottom = UDim.new(0, -1),
@@ -7143,6 +7137,13 @@ do -- Elements
                 ButtonGroup.UpdateButtonSizes()
             end
 		end
+
+		Holder_7.GroupTransparency = 1
+		task_defer(function()
+			Holder_7.Position = UDim2_fromOffset((Viewport.X / 2) - (Holder_7.AbsoluteSize.X / 2), (Viewport.Y / 2) - (Holder_7.AbsoluteSize.Y / 2))
+			Window.CreateColorPicker()
+			Library.TweenObject(Holder_7, TweenInfo_new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {GroupTransparency = 0})
+		end)
 		
 		return Window	
 	end
@@ -7157,9 +7158,9 @@ Library.UpdateThemeList()
 do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
-        Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
+        Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.LightContrast,
         BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
+    }); Library.AddTheme(WM, {BackgroundColor3 = "LightContrast"})
 
     local WMStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM}); Library.AddTheme(WMStroke, {Color = "Outline"})
 
@@ -7208,9 +7209,9 @@ do
     local KL = Library.CreateObject("CanvasGroup", {
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
         Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
-        AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
+        AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.LightContrast,
         BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
+    }); Library.AddTheme(KL, {BackgroundColor3 = "LightContrast"})
     local KLStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL}); Library.AddTheme(KLStroke, {Color = "Outline"})
 
     local KLAccent = Library.CreateObject("Frame", {
@@ -7253,9 +7254,9 @@ do
     local TH = Library.CreateObject("CanvasGroup", {
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
         Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
-        BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
+        BackgroundColor3 = ThemeDefault.LightContrast, BorderSizePixel = 0,
         Visible = false, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
+    }); Library.AddTheme(TH, {BackgroundColor3 = "LightContrast"})
     local THStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH}); Library.AddTheme(THStroke, {Color = "Outline"})
 
     local THAccent = Library.CreateObject("Frame", {
@@ -7532,20 +7533,20 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
                 BorderColor3 = Color3_fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = ThemeDefault.Outline,
+                BackgroundColor3 = ThemeDefault.LightContrast,
                 Parent = SectionOutline_2
-            }); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Outline" })
+            }); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "LightContrast" })
 
             local SectionInline_2 = Library.CreateObject("Frame", {
-                Size = UDim2_new(1, -2, 1, -2),
+                Size = UDim2_new(1, 0, 1, 0),
                 Name = "SectionInline_2",
-                Position = UDim2_new(0, 1, 0, 1),
+                Position = UDim2_new(0, 0, 0, 0),
                 BorderColor3 = Color3_fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = ThemeDefault.Outline,
+                BackgroundColor3 = ThemeDefault.LightContrast,
                 Parent = SectionAccent_2
-            }); Library.AddTheme(SectionInline_2, { BackgroundColor3 = "Outline" })
+            }); Library.AddTheme(SectionInline_2, { BackgroundColor3 = "LightContrast" })
 
             Library.CreateObject("UIPadding", {
                 PaddingBottom = UDim.new(0, -1),
