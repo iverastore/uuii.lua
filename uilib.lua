@@ -124,11 +124,11 @@ getgenv().Library = {
 	Sections = {},
 	Unloaded = Instance_new("BindableEvent"),
 	UI = {
-		UIName = "coolhack",
+		UIName = "alternate.lol",
 		ScriptVersion = "v.0.1",
 		ScriptBuild = "beta",
 		ScriptUser = "admin",
-		FolderLocation = "coolhack",
+		FolderLocation = "alternate.lol",
         KeybindType = "Upper",
 		ClampDragging = false,
 		HoverHighlight = false,
@@ -1424,6 +1424,8 @@ do -- Elements
 
                 -- Destroy existing mode list if open
                 if Keybind.ModeList then
+                    local idx = table_find(UITable.ModeLists, Keybind.ModeList)
+                    if idx then table_remove(UITable.ModeLists, idx) end
                     pcall(function() Keybind.ModeList:Destroy() end)
                     Keybind.ModeList = nil
                     return
@@ -1482,6 +1484,8 @@ do -- Elements
                         Keybind.SetMode(ModeMap[modeName])
                         -- Close the menu
                         if Keybind.ModeList then
+                            local idx = table_find(UITable.ModeLists, Keybind.ModeList)
+                            if idx then table_remove(UITable.ModeLists, idx) end
                             pcall(function() Keybind.ModeList:Destroy() end)
                             Keybind.ModeList = nil
                         end
@@ -1494,6 +1498,8 @@ do -- Elements
                     closeConn = Library.AddConnection(UserInputService.InputBegan, function(Input)
                         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
                             if ModeFrame and ModeFrame.Parent and not Library.MouseOverFrame(ModeFrame) then
+                                local idx = table_find(UITable.ModeLists, ModeFrame)
+                                if idx then table_remove(UITable.ModeLists, idx) end
                                 pcall(function() ModeFrame:Destroy() end)
                                 Keybind.ModeList = nil
                                 if closeConn then closeConn:Disconnect() end
@@ -7189,7 +7195,7 @@ do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
         Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
 
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM})
@@ -7244,7 +7250,7 @@ do
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
         Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
         AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL})
 
@@ -7293,7 +7299,7 @@ do
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
         Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
         BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
-        Visible = false, Parent = UITable.ScreenGui
+        Visible = false, Parent = UITable.ExtrasScreenGui
     }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH})
 
