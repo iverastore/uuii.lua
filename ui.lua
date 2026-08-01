@@ -1456,6 +1456,12 @@ function Library:Window(Opts)
 						Library:CreateInstance("UIListLayout", { Parent = ModePopup; Padding = UDim.new(0, 0); SortOrder = Enum.SortOrder.LayoutOrder });
 						Library:CreateInstance("UIPadding", { Parent = ModePopup; PaddingTop = UDim.new(0, 3); PaddingBottom = UDim.new(0, 3); PaddingLeft = UDim.new(0, 5) });
 						local modes = {"Toggle", "Hold", "Always", "None"};
+						local popupClosed = false;
+						local function ClosePopup()
+							if popupClosed then return end;
+							popupClosed = true;
+							if PopupGui and PopupGui.Parent then PopupGui:Destroy() end;
+						end;
 						for _, m in modes do
 							local mb = Library:CreateInstance("TextButton", {
 								Parent = ModePopup; Size = UDim2.new(1, 0, 0, 15);
@@ -1473,17 +1479,26 @@ function Library:Window(Opts)
 								end;
 								Refresh();
 								Library:NotifyKeybind();
-								PopupGui:Destroy();
+								ClosePopup();
 							end);
 						end;
 						local closeConn;
-						closeConn = UserInputService.InputBegan:Connect(function(Input)
-							if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
-								task.delay(0.1, function()
-									if PopupGui and PopupGui.Parent then PopupGui:Destroy() end;
-									if closeConn then closeConn:Disconnect() end;
-								end);
-							end;
+						task.delay(0.2, function()
+							if popupClosed then return end;
+							closeConn = UserInputService.InputBegan:Connect(function(Input)
+								if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
+									local M = UserInputService:GetMouseLocation();
+									local Ap = ModePopup.AbsolutePosition;
+									local Sz = ModePopup.AbsoluteSize;
+									local inside = M.X >= Ap.X and M.X <= Ap.X + Sz.X and M.Y >= Ap.Y and M.Y <= Ap.Y + Sz.Y;
+									if not inside then
+										task.defer(function()
+											ClosePopup();
+											if closeConn then closeConn:Disconnect(); closeConn = nil end;
+										end);
+									end;
+								end;
+							end);
 						end);
 					end);
 
