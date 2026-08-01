@@ -1424,10 +1424,10 @@ do -- Elements
             end))
 
             -- Right-click mode selection menu
-            Library.AddConnection(KeybindText.MouseButton2Click, LPH_NO_VIRTUALIZE(function()
-                if Library.MouseOverOtherWindow(Options.MainUI) then
-                    return
-                end
+            Library.AddConnection(UserInputService.InputBegan, LPH_NO_VIRTUALIZE(function(Input)
+                if Input.UserInputType ~= Enum.UserInputType.MouseButton2 then return end
+                if not Library.MouseOverFrame(KeybindOutline) then return end
+                if Library.MouseOverOtherWindow(Options.MainUI) then return end
 
                 -- Destroy existing mode list if open
                 if Keybind.ModeList then
