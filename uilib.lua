@@ -1102,7 +1102,7 @@ end
 
 Library.__index = Library
 Library.Sections.__index = Library.Sections
-UITable.Font = Files.Fonts.Loaded["Tahoma"]
+UITable.Font = Font_new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 UITable.ScreenGui = Library.CreateObject("ScreenGui", {
 	Name = "\n",
 	ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
@@ -1311,7 +1311,12 @@ do -- Elements
                 if Bool ~= nil then
                     Keybind.Value = Bool
                 else
-                    Keybind.Value = not Keybind.Value
+                    -- Sync with parent toggle's actual state for correct toggling
+                    if Options.Toggle and Options.Toggle.Value ~= nil then
+                        Keybind.Value = not Options.Toggle.Value
+                    else
+                        Keybind.Value = not Keybind.Value
+                    end
                 end
 
                 if not Options.HideFromList then
@@ -1326,10 +1331,12 @@ do -- Elements
                 if Options.Toggle and Options.Toggle.ToggleUI then
                     Options.Toggle.ToggleUI(Keybind.Value)
                 else
-                    if Options.Toggle.GetFlag then
+                    if Options.Toggle and Options.Toggle.GetFlag then
                         Library.Flags[Options.Toggle.GetFlag()] = Keybind
                     end
-                    Options.Toggle.GetCallback(Keybind.Value)
+                    if Options.Toggle and Options.Toggle.GetCallback then
+                        Options.Toggle.GetCallback(Keybind.Value)
+                    end
                 end
             end
 
