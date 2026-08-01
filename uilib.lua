@@ -6265,8 +6265,19 @@ do -- Elements
 				end
 
 				for _, Object in ObjectsTable do
-					Object[1]:Destroy()
+					pcall(function() Object[1]:Destroy() end)
 				end
+
+				-- Destroy the ScreenGuis directly
+				pcall(function()
+					if UITable.ScreenGui then UITable.ScreenGui:Destroy() end
+				end)
+				pcall(function()
+					if UITable.ExtrasScreenGui then UITable.ExtrasScreenGui:Destroy() end
+				end)
+
+				-- Clear library reference
+				getgenv().Library = nil
 			end
 		end
 		
@@ -7352,7 +7363,7 @@ end
 function Library.CreateSubTabs(ParentTab, SubTabNames)
     -- ParentTab = WindowTab returned by CreateTab
     -- SubTabNames = {"Aimbot", "Silent", "Aimbot+"}
-    -- Returns table of {Name = SectionWrapper} for each subtab
+    -- Returns table of {Name = SubTabWrapper} for each subtab
 
     local holder = ParentTab.Holder
     if not holder then return {} end
@@ -7372,15 +7383,20 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
         Parent = SubNav
     })
 
-    -- Move existing content down to make room
+    -- Hide existing content (parent tab's default Left/Right columns) since subtabs replace them
+    -- Also remove the horizontal UIListLayout that would conflict with vertical subtab layout
     for _, child in holder:GetChildren() do
-        if child ~= SubNav and child:IsA("GuiObject") then
-            child.Position = child.Position + UDim2_new(0, 0, 0, 26)
-            child.Size = child.Size - UDim2_new(0, 0, 0, 26)
+        if child ~= SubNav then
+            if child:IsA("UIListLayout") then
+                child:Destroy()
+            elseif child:IsA("UIFlexItem") then
+                child:Destroy()
+            elseif child:IsA("GuiObject") then
+                child.Visible = false
+            end
         end
     end
 
-    local subTabs = {}
     local subHolders = {}
     local activeSubTab = nil
 
@@ -7450,28 +7466,185 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
     end
 
     -- Return section creators for each subtab
+    -- Each subtab entry has a .Section(opts) function that creates proper sections
     local result = {}
     for name, data in pairs(subHolders) do
-        result[name] = {
-            Left = data.left,
-            Right = data.right,
-            Section = function(opts)
-                opts = opts or {}
-                local side = opts.Side or "Left"
-                if side == 1 then side = "Left" elseif side == 2 then side = "Right" end
-                local parent = side == "Right" and data.right or data.left
-                local Section = Library.CreateObject("Frame", {
-                    Name = opts.Name or "Section",
-                    AutomaticSize = Enum.AutomaticSize.Y,
-                    BackgroundColor3 = ThemeDefault.DarkContrast,
-                    BorderSizePixel = 0, Size = UDim2_new(1, 0, 0, 0),
-                    Parent = parent
-                }); Library.AddTheme(Section, {BackgroundColor3 = "DarkContrast"})
-                -- This hooks into the existing Sections system
-                -- For now return the parent section creator
-                return parent
-            end,
-        }
+        local subTabWrapper = {}
+
+        -- Section function creates a proper section inside this subtab
+        function subTabWrapper.Section(opts)
+            opts = opts or {}
+            local side = opts.Side or "Left"
+            if side == 1 then side = "Left" elseif side == 2 then side = "Right" end
+            local parent = side == "Right" and data.right or data.left
+
+            -- Use the same Section construction as Window.Section but with our subtab parent
+            local Section = {
+                Elements = {},
+            }
+
+            UITable.SectionZIndex = (UITable.SectionZIndex or 100) - 1
+
+            local SectionOutline_2 = Library.CreateObject("Frame", {
+                Name = "SectionOutline_2",
+                Size = UDim2_new(1, 0, 0, 0),
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = ThemeDefault.Outline,
+                Parent = parent
+            }); Library.AddTheme(SectionOutline_2, { BackgroundColor3 = "Outline" })
+
+            Library.CreateObject("UIShadow", {
+                Name = "SectionOutline_21",
+                Transparency = 0.5,
+                BlurRadius = UDim_new(0, 7),
+                Parent = SectionOutline_2
+            })
+
+            Library.CreateObject("UIPadding", {
+                PaddingBottom = UDim.new(0, 2),
+                Parent = SectionOutline_2
+            })
+
+            local SectionAccent_2 = Library.CreateObject("Frame", {
+                Size = UDim2_new(1, -2, 1, -2),
+                Name = "SectionAccent_2",
+                Position = UDim2_new(0, 1, 0, 1),
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = ThemeDefault.Accent,
+                Parent = SectionOutline_2
+            }); Library.AddTheme(SectionAccent_2, { BackgroundColor3 = "Accent" })
+
+            local SectionInline_2 = Library.CreateObject("Frame", {
+                Size = UDim2_new(1, -2, 1, -2),
+                Name = "SectionInline_2",
+                Position = UDim2_new(0, 1, 0, 1),
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = ThemeDefault.Outline,
+                Parent = SectionAccent_2
+            }); Library.AddTheme(SectionInline_2, { BackgroundColor3 = "Outline" })
+
+            Library.CreateObject("UIPadding", {
+                PaddingBottom = UDim.new(0, -1),
+                Parent = SectionInline_2
+            })
+
+            local SectionGradient_2 = Library.CreateObject("Frame", {
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                Size = UDim2_new(1, -2, 0, -2),
+                Name = "SectionGradient_2",
+                Position = UDim2_new(0, 1, 0, 1),
+                BorderSizePixel = 0,
+                ZIndex = 2,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = ThemeDefault.LightContrast,
+                Parent = SectionInline_2
+            }); Library.AddTheme(SectionGradient_2, { BackgroundColor3 = "LightContrast" })
+
+            local UIPadding_72 = Library.CreateObject("UIPadding", {
+                PaddingBottom = UDim.new(0, 3),
+                PaddingTop = UDim.new(0, 4),
+                PaddingRight = UDim.new(0, -2),
+                Parent = SectionGradient_2
+            })
+
+            Library.CreateObject("UIPadding", {
+                PaddingBottom = UDim.new(0, 2),
+                Parent = SectionAccent_2
+            })
+
+            local Holder_14 = Library.CreateObject("ScrollingFrame", {
+                Active = true,
+                AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                ScrollingDirection = Enum.ScrollingDirection.Y,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                CanvasSize = UDim2_new(0, 0, 0, 0),
+                ScrollBarImageColor3 = ThemeDefault.Accent,
+                MidImage = "rbxassetid://95591733073455",
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                ScrollBarThickness = 3,
+                Name = "Holder_14",
+                Size = UDim2_new(1, -2, 1, -2),
+                Position = UDim2_new(0, 1, 0, 1),
+                TopImage = "rbxassetid://95591733073455",
+                BorderSizePixel = 0,
+                BottomImage = "rbxassetid://95591733073455",
+                BackgroundTransparency = 1,
+                Parent = SectionGradient_2
+            }); Library.AddTheme(Holder_14, { ScrollBarImageColor3 = "Accent" })
+
+            Library.CreateObject("UIListLayout", {
+                Padding = UDim.new(0, 5),
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Parent = Holder_14
+            })
+
+            Library.CreateObject("UIPadding", {
+                PaddingTop = UDim.new(0, 1),
+                PaddingBottom = UDim.new(0, 4),
+                PaddingRight = UDim.new(0, 7),
+                PaddingLeft = UDim.new(0, 5),
+                Parent = Holder_14
+            })
+
+            local LibraryFont = UITable.Font
+            local LibraryFontSize = UITable.FontSize or 12
+
+            local Title_29 = Library.CreateObject("TextLabel", {
+                FontFace = LibraryFont,
+                TextColor3 = ThemeDefault.TextColor,
+                BorderColor3 = Color3_fromRGB(0, 0, 0),
+                Text = opts.Name or "Section",
+                AnchorPoint = Vector2_new(0, 0.5),
+                Name = "Title_29",
+                Position = UDim2_new(0, 10, 0, 0),
+                BorderSizePixel = 0,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                AutomaticSize = Enum.AutomaticSize.XY,
+                TextSize = LibraryFontSize,
+                BackgroundColor3 = ThemeDefault.LightContrast,
+                Parent = SectionOutline_2
+            }); Library.AddTheme(Title_29, { TextColor3 = "TextColor", BackgroundColor3 = "LightContrast" })
+
+            Library.CreateObject("UIStroke", {
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                Parent = Title_29
+            })
+
+            Library.CreateObject("UIPadding", {
+                PaddingRight = UDim.new(0, 2),
+                PaddingLeft = UDim.new(0, 3),
+                Parent = Title_29
+            })
+
+            if opts.Fill then
+                local UIFlexItem_2 = Library.CreateObject("UIFlexItem", {
+                    FlexMode = Enum.UIFlexMode.Fill,
+                    Parent = SectionOutline_2
+                })
+
+                SectionOutline_2.AutomaticSize = Enum.AutomaticSize.None
+                SectionAccent_2.AutomaticSize = Enum.AutomaticSize.None
+                SectionInline_2.AutomaticSize = Enum.AutomaticSize.None
+                SectionGradient_2.AutomaticSize = Enum.AutomaticSize.None
+                Holder_14.AutomaticSize = Enum.AutomaticSize.None
+                SectionGradient_2.Size = UDim2_new(1, -2, 1, -2)
+            end
+
+            Section.Elements = {
+                Name = Title_29,
+                ElementsHolder = Holder_14,
+            }
+
+            return setmetatable(Section, Library.Sections)
+        end
+
+        result[name] = subTabWrapper
     end
 
     return result
