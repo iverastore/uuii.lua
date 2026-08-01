@@ -220,13 +220,13 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(114, 137, 218),
-			SecondAccent = Color3_fromRGB(78, 93, 148),
-			LightContrast = Color3_fromRGB(24, 24, 28),
-			DarkContrast = Color3_fromRGB(18, 18, 21),
-			Outline = Color3_fromRGB(36, 36, 40),
-			TextColor = Color3_fromRGB(210, 210, 215),
-			TextDark = Color3_fromRGB(110, 110, 120),
+			Accent = Color3_fromRGB(180, 40, 40),
+			SecondAccent = Color3_fromRGB(120, 20, 20),
+			LightContrast = Color3_fromRGB(18, 18, 18),
+			DarkContrast = Color3_fromRGB(12, 12, 12),
+			Outline = Color3_fromRGB(30, 30, 30),
+			TextColor = Color3_fromRGB(200, 200, 200),
+			TextDark = Color3_fromRGB(100, 100, 100),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
 		Presets = {},
@@ -3494,7 +3494,7 @@ do -- Elements
             function Slider.Set(Value)
                 local Value = Value and math_clamp(Options.Decimal * math_round(Value / Options.Decimal), Options.Min, Options.Max)
                 
-                SliderValue.Text = Slider.ReturnValue(Value) .. Options.Suffix .. "/" .. Slider.ReturnValue(Options.Max) .. Options.Suffix
+                SliderValue.Text = Slider.ReturnValue(Value) .. Options.Suffix
                 
                 if Value ~= Slider.Value then
                     Slider.Value = Value
