@@ -2950,6 +2950,11 @@ do -- Elements
 				Options.Callback(Bool)
 			end
 
+			function Toggle.HideCheckbox()
+				ToggleOutline_2.Visible = false
+				Title_24.Position = UDim2_new(0, 0, 0, -1)
+			end
+
 			function Toggle.Keybind(Options)
 				Options = Library.Validate({
 					Text = "",
@@ -6051,10 +6056,12 @@ do -- Elements
                             end
                         end
 
-                        if Table.FirstClick == false then
-                            ColorPicker.Position = UDim2_fromOffset(Holder_7.AbsolutePosition.X - ColorPicker.AbsoluteSize.X - 10, Holder_7.AbsolutePosition.Y + Inset.Y)
-                            Table.FirstClick = true
-                        end
+                        local mousePos = UserInputService:GetMouseLocation()
+                        local cpW = ColorPicker.AbsoluteSize.X
+                        local cpH = ColorPicker.AbsoluteSize.Y
+                        local posX = math_clamp(mousePos.X + 10, 0, Viewport.X - cpW - 10)
+                        local posY = math_clamp(mousePos.Y - cpH / 2, 10, Viewport.Y - cpH - 10)
+                        ColorPicker.Position = UDim2_fromOffset(posX, posY)
 
                         Library.HideOther(ColorPickerName)
 
@@ -7158,9 +7165,9 @@ Library.UpdateThemeList()
 do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
-        Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.LightContrast,
+        Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
         BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(WM, {BackgroundColor3 = "LightContrast"})
+    }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
 
     local WMStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM}); Library.AddTheme(WMStroke, {Color = "Outline"})
 
@@ -7209,9 +7216,9 @@ do
     local KL = Library.CreateObject("CanvasGroup", {
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
         Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
-        AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.LightContrast,
+        AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
         BorderSizePixel = 0, Visible = true, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(KL, {BackgroundColor3 = "LightContrast"})
+    }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
     local KLStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL}); Library.AddTheme(KLStroke, {Color = "Outline"})
 
     local KLAccent = Library.CreateObject("Frame", {
@@ -7254,9 +7261,9 @@ do
     local TH = Library.CreateObject("CanvasGroup", {
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
         Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
-        BackgroundColor3 = ThemeDefault.LightContrast, BorderSizePixel = 0,
+        BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
         Visible = false, Parent = UITable.ExtrasScreenGui
-    }); Library.AddTheme(TH, {BackgroundColor3 = "LightContrast"})
+    }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
     local THStroke = Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH}); Library.AddTheme(THStroke, {Color = "Outline"})
 
     local THAccent = Library.CreateObject("Frame", {
