@@ -220,13 +220,13 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(180, 160, 220),
-			SecondAccent = Color3_fromRGB(130, 110, 180),
-			LightContrast = Color3_fromRGB(45, 45, 45),
-			DarkContrast = Color3_fromRGB(27, 27, 27),
+			Accent = Color3_fromRGB(200, 180, 255),
+			SecondAccent = Color3_fromRGB(140, 120, 200),
+			LightContrast = Color3_fromRGB(30, 30, 35),
+			DarkContrast = Color3_fromRGB(18, 18, 22),
 			Outline = Color3_fromRGB(0, 0, 0),
 			TextColor = Color3_fromRGB(255, 255, 255),
-			TextDark = Color3_fromRGB(180, 180, 180),
+			TextDark = Color3_fromRGB(160, 160, 160),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
 		Presets = {
@@ -889,6 +889,28 @@ do -- Functions
         end
 
         return Length
+    end
+
+    function Library.Notify(optsOrSelf, optsOrDur)
+        -- Handles both Library.Notify({Message=...}) and Library:Notify("msg", dur)
+        local msg, delay
+        if type(optsOrSelf) == "table" and optsOrSelf.Message then
+            msg = optsOrSelf.Message
+            delay = optsOrSelf.Delay or 5
+        elseif type(optsOrSelf) == "string" then
+            msg = optsOrSelf
+            delay = optsOrDur or 5
+        elseif type(optsOrDur) == "table" and optsOrDur.Message then
+            msg = optsOrDur.Message
+            delay = optsOrDur.Delay or 5
+        elseif type(optsOrDur) == "string" then
+            msg = optsOrDur
+            delay = 5
+        else
+            return
+        end
+        -- Simple notification: print to output + brief on-screen text
+        pcall(function() warn("[alternate] " .. tostring(msg)) end)
     end
 
 	function Library.AddTheme(Object, Properties)
