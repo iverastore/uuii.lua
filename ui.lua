@@ -1495,18 +1495,19 @@ function Library:Window(Opts)
 						local closeConn;
 						task.delay(0.25, function()
 							if popupClosed then return end;
-							closeConn = UserInputService.InputBegan:Connect(function(Input)
+							closeConn = UserInputService.InputEnded:Connect(function(Input)
 								if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
-									local M = UserInputService:GetMouseLocation();
-									local Ap = ModePopup.AbsolutePosition;
-									local Sz = ModePopup.AbsoluteSize;
-									local inside = M.X >= Ap.X and M.X <= Ap.X + Sz.X and M.Y >= Ap.Y and M.Y <= Ap.Y + Sz.Y;
-									if not inside then
-										task.defer(function()
+									task.defer(function()
+										if popupClosed then return end;
+										local M = UserInputService:GetMouseLocation();
+										local Ap = ModePopup.AbsolutePosition;
+										local Sz = ModePopup.AbsoluteSize;
+										local inside = M.X >= Ap.X and M.X <= Ap.X + Sz.X and M.Y >= Ap.Y and M.Y <= Ap.Y + Sz.Y;
+										if not inside then
 											ClosePopup();
 											if closeConn then closeConn:Disconnect(); closeConn = nil end;
-										end);
-									end;
+										end;
+									end);
 								end;
 							end);
 						end);
