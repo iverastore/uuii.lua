@@ -1426,10 +1426,48 @@ function Library:Window(Opts)
 
 					KBtn.MouseButton1Click:Connect(StartListen);
 					KBtn.MouseButton2Click:Connect(function()
-						if Listening then CancelListen() end;
-						Key = nil;
-						Refresh();
-						Library:NotifyKeybind();
+						if Listening then CancelListen(); return end;
+						local ModePopup = Library:CreateInstance("CanvasGroup", {
+							Parent = (gethui and gethui()) or CoreGui;
+							Size = UDim2.fromOffset(80, 70);
+							Position = UDim2.fromOffset(KBtn.AbsolutePosition.X, KBtn.AbsolutePosition.Y + KBtn.AbsoluteSize.Y + 2);
+							BackgroundColor3 = Color3.fromHex("141414");
+							BorderSizePixel = 0;
+							ZIndex = 999;
+						});
+						Library:CreateInstance("UIStroke", { Parent = ModePopup; Color = Color3.fromHex("2a2a2a"); Thickness = 1 });
+						Library:CreateInstance("UIListLayout", { Parent = ModePopup; Padding = UDim.new(0, 0); SortOrder = Enum.SortOrder.LayoutOrder });
+						Library:CreateInstance("UIPadding", { Parent = ModePopup; PaddingTop = UDim.new(0, 3); PaddingBottom = UDim.new(0, 3); PaddingLeft = UDim.new(0, 5) });
+						local modes = {"Toggle", "Hold", "Always", "None"};
+						for _, m in modes do
+							local mb = Library:CreateInstance("TextButton", {
+								Parent = ModePopup; Size = UDim2.new(1, 0, 0, 15);
+								BackgroundTransparency = 1; BorderSizePixel = 0; AutoButtonColor = false;
+								Text = m; TextColor3 = (m:lower() == BindMode) and Color3.fromHex("FFFFFF") or Color3.fromHex("888888");
+								TextSize = 11; TextXAlignment = Enum.TextXAlignment.Left;
+							});
+							if ProggyCleanFont then mb.FontFace = ProggyCleanFont end;
+							mb.MouseButton1Click:Connect(function()
+								if m == "None" then
+									Key = nil;
+									BindMode = "toggle";
+								else
+									BindMode = m:lower();
+								end;
+								Refresh();
+								Library:NotifyKeybind();
+								ModePopup:Destroy();
+							end);
+						end;
+						local closeConn;
+						closeConn = UserInputService.InputBegan:Connect(function(Input)
+							if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
+								task.delay(0.1, function()
+									if ModePopup and ModePopup.Parent then ModePopup:Destroy() end;
+									if closeConn then closeConn:Disconnect() end;
+								end);
+							end;
+						end);
 					end);
 
 					local function KeyMatches(Input)
@@ -5435,9 +5473,23 @@ function Library:Unload()
 	end;
 	self.CurrentlyOpen = nil;
 
+	if self._Watermark and self._Watermark.Gui then
+		pcall(function() self._Watermark.Gui:Destroy() end);
+		self._Watermark = nil;
+	end;
+	if self._KeybindList and self._KeybindList.Gui then
+		pcall(function() self._KeybindList.Gui:Destroy() end);
+		self._KeybindList = nil;
+	end;
+	if self._TooltipGui then
+		pcall(function() self._TooltipGui:Destroy() end);
+		self._TooltipGui = nil;
+	end;
+
 	self.Flags = {};
 	self.Toggles = {};
 	self.Options = {};
+	getgenv().Library = nil;
 	self:Log("Unload complete");
 end;
 
