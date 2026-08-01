@@ -92,7 +92,7 @@ function Library:OnKeybindChange(Fn)
 end;
 
 local AccentClock = 0;
-Library:Connection(game:GetService("RunService").Heartbeat, function(Dt)
+local _AccentConn = game:GetService("RunService").Heartbeat:Connect(function(Dt)
 	AccentClock = AccentClock + Dt * 0.8;
 	local Off = (AccentClock % 2) - 1;
 	local OffsetV = Vector2.new(Off, 0);
@@ -5427,6 +5427,7 @@ end;
 
 function Library:Unload()
 	self:Log("Unload requested");
+	if _AccentConn then _AccentConn:Disconnect(); _AccentConn = nil end;
 	for _, Conn in self.Connections do
 		if Conn ~= nil then
 			Conn:Disconnect();
