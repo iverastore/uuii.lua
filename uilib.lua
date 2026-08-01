@@ -7060,3 +7060,236 @@ end
 DefaultThemes = Library.GetTableIndexes(ThemeTable.Presets, true)
 Library.UpdateThemeList()
 
+
+-- ═══════════════════════════════════════════════════════════════
+-- WATERMARK (themed, auto-sizing)
+-- ═══════════════════════════════════════════════════════════════
+do
+    local WatermarkFrame = Library.CreateObject("CanvasGroup", {
+        Name = "Watermark",
+        Position = UDim2_fromOffset(10, 10),
+        Size = UDim2_new(0, 220, 0, 24),
+        BackgroundColor3 = ThemeDefault.DarkContrast,
+        BorderSizePixel = 0,
+        Visible = true,
+        Parent = UITable.ScreenGui
+    }); Library.AddTheme(WatermarkFrame, {BackgroundColor3 = "DarkContrast"})
+
+    Library.CreateObject("UIStroke", {
+        Color = ThemeDefault.Outline,
+        Thickness = 1,
+        Parent = WatermarkFrame
+    })
+
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = WatermarkFrame})
+
+    local WMGrad = Library.CreateObject("Frame", {
+        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = WatermarkFrame
+    })
+    Library.CreateObject("UIGradient", {
+        Rotation = 0,
+        Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}),
+        Parent = WMGrad
+    })
+
+    local WMText = Library.CreateObject("TextLabel", {
+        Name = "Text", FontFace = UITable.Font, Text = UITable.UIName,
+        TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
+        BackgroundTransparency = 1, Size = UDim2_new(1, 0, 1, 0),
+        Position = UDim2_new(0, 0, 0, 1), BorderSizePixel = 0, Parent = WatermarkFrame
+    }); Library.AddTheme(WMText, {TextColor3 = "TextColor"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = WMText})
+    Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,6), PaddingRight = UDim_new(0,6), Parent = WMText})
+
+    task.spawn(function()
+        while task.wait(UITable.WatermarkRefreshRate or 0.15) do
+            if WatermarkFrame and WatermarkFrame.Parent and WatermarkFrame.Visible then
+                local fps = math_floor(1 / (RunService.RenderStepped:Wait() + 0.0001))
+                local ping = 0
+                pcall(function() local s = game:GetService("Stats"):FindFirstChild("PerformanceStats"); if s then local p = s:FindFirstChild("Ping"); if p then ping = math_floor(p.Value) end end end)
+                WMText.Text = string_format("%s | %dfps | %dms | %s", UITable.UIName, fps, ping, os_date("%H:%M:%S"))
+                local ts = game:GetService("TextService"):GetTextSize(WMText.Text, UITable.FontSize, Enum.Font.SourceSansBold, Vector2_new(1000, 24))
+                WatermarkFrame.Size = UDim2_new(0, ts.X + 18, 0, 24)
+            end
+        end
+    end)
+
+    function Library.SetWatermarkVisible(Bool) WatermarkFrame.Visible = Bool end
+    Library.WatermarkFrame = WatermarkFrame
+end
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- KEYBIND LIST (themed, right side)
+-- ═══════════════════════════════════════════════════════════════
+do
+    local KLFrame = Library.CreateObject("CanvasGroup", {
+        Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
+        Position = UDim2_new(1, -10, 0, 45), Size = UDim2_new(0, 180, 0, 26),
+        AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+    }); Library.AddTheme(KLFrame, {BackgroundColor3 = "DarkContrast"})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KLFrame})
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = KLFrame})
+
+    local KLGrad = Library.CreateObject("Frame", {
+        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = KLFrame
+    })
+    Library.CreateObject("UIGradient", {Rotation = 0, Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}), Parent = KLGrad})
+
+    local KLTitle = Library.CreateObject("TextLabel", {
+        Name = "Title", FontFace = UITable.Font, Text = "Keybinds",
+        TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
+        BackgroundTransparency = 1, Size = UDim2_new(1, 0, 0, 22),
+        Position = UDim2_new(0,0,0,2), BorderSizePixel = 0, Parent = KLFrame
+    }); Library.AddTheme(KLTitle, {TextColor3 = "TextColor"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = KLTitle})
+
+    local KLHolder = Library.CreateObject("Frame", {
+        Name = "Holder", BackgroundTransparency = 1, Position = UDim2_new(0,0,0,24),
+        Size = UDim2_new(1,0,0,0), AutomaticSize = Enum.AutomaticSize.Y,
+        BorderSizePixel = 0, Parent = KLFrame
+    })
+    Library.CreateObject("UIListLayout", {Padding = UDim_new(0,1), SortOrder = Enum.SortOrder.LayoutOrder, Parent = KLHolder})
+    Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,6), PaddingRight = UDim_new(0,6), PaddingBottom = UDim_new(0,4), Parent = KLHolder})
+
+    UITable.KeybindListUI = KLFrame
+    UITable.KeybindListHolder = KLHolder
+
+    function Library.SetKeybindListVisible(Bool) KLFrame.Visible = Bool end
+
+    function Library.RefreshKeybindList()
+        for _, c in KLHolder:GetChildren() do if c:IsA("Frame") then c:Destroy() end end
+        local any = false
+        for flag, obj in pairs(Library.Flags) do
+            if type(obj) == "table" and obj.KeybindKey and obj.Value == true then
+                any = true
+                local entry = Library.CreateObject("Frame", {
+                    Name = "KB", BackgroundTransparency = 1,
+                    Size = UDim2_new(1, 0, 0, 14), Parent = KLHolder
+                })
+                Library.CreateObject("TextLabel", {
+                    FontFace = UITable.Font, Text = obj.Name or flag,
+                    TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
+                    TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
+                    Size = UDim2_new(0.7,0,1,0), Parent = entry
+                })
+                Library.CreateObject("TextLabel", {
+                    FontFace = UITable.Font, Text = "[" .. tostring(obj.KeybindKey) .. "]",
+                    TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize,
+                    TextXAlignment = Enum.TextXAlignment.Right, BackgroundTransparency = 1,
+                    Size = UDim2_new(0.3,0,1,0), Position = UDim2_new(0.7,0,0,0), Parent = entry
+                })
+            end
+        end
+        if not any then KLFrame.Visible = false end
+    end
+end
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- TARGET HUD (themed, centered top)
+-- ═══════════════════════════════════════════════════════════════
+do
+    local THud = Library.CreateObject("CanvasGroup", {
+        Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
+        Position = UDim2_new(0.5, 0, 0, 80), Size = UDim2_new(0, 250, 0, 64),
+        BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
+        Visible = false, Parent = UITable.ScreenGui
+    }); Library.AddTheme(THud, {BackgroundColor3 = "DarkContrast"})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THud})
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = THud})
+
+    local THGrad = Library.CreateObject("Frame", {
+        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = THud
+    })
+    Library.CreateObject("UIGradient", {Rotation = 0, Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}), Parent = THGrad})
+
+    local THAvatar = Library.CreateObject("ImageLabel", {
+        Name = "Avatar", BackgroundColor3 = ThemeDefault.LightContrast,
+        BorderSizePixel = 0, Position = UDim2_new(0, 8, 0, 10),
+        Size = UDim2_new(0, 44, 0, 44), Image = "", Parent = THud
+    }); Library.AddTheme(THAvatar, {BackgroundColor3 = "LightContrast"})
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = THAvatar})
+
+    local THName = Library.CreateObject("TextLabel", {
+        Name = "Name", FontFace = UITable.Font, Text = "Target",
+        TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
+        TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
+        Position = UDim2_new(0, 60, 0, 8), Size = UDim2_new(1, -68, 0, 16), Parent = THud
+    }); Library.AddTheme(THName, {TextColor3 = "TextColor"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THName})
+
+    local THHPBg = Library.CreateObject("Frame", {
+        Name = "HPBg", BackgroundColor3 = ThemeDefault.LightContrast,
+        BorderSizePixel = 0, Position = UDim2_new(0, 60, 0, 30),
+        Size = UDim2_new(1, -68, 0, 10), Parent = THud
+    }); Library.AddTheme(THHPBg, {BackgroundColor3 = "LightContrast"})
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 3), Parent = THHPBg})
+
+    local THHPBar = Library.CreateObject("Frame", {
+        Name = "HPBar", BackgroundColor3 = ThemeDefault.Accent,
+        BorderSizePixel = 0, Size = UDim2_new(1, 0, 1, 0), Parent = THHPBg
+    }); Library.AddTheme(THHPBar, {BackgroundColor3 = "Accent"})
+    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 3), Parent = THHPBar})
+
+    local THHPText = Library.CreateObject("TextLabel", {
+        Name = "HPText", FontFace = UITable.Font, Text = "100/100",
+        TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
+        TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
+        Position = UDim2_new(0, 60, 0, 44), Size = UDim2_new(1, -68, 0, 14), Parent = THud
+    }); Library.AddTheme(THHPText, {TextColor3 = "TextDark"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THHPText})
+
+    -- API
+    local TargetHUDAPI = {Visible = false, Target = nil, Items = {Container = THud}}
+
+    function TargetHUDAPI:SetVisibility(v)
+        self.Visible = v
+        if not v then THud.Visible = false end
+    end
+
+    function TargetHUDAPI:SetTarget(t)
+        self.Target = t
+        if not t or not self.Visible then THud.Visible = false; return end
+        local name, userId, char = "Unknown", 0, nil
+        if typeof(t) == "Instance" then
+            if t:IsA("Player") then name = t.DisplayName or t.Name; userId = t.UserId; char = t.Character
+            elseif t:IsA("Model") then
+                name = t.Name; char = t
+                local plr = Players:GetPlayerFromCharacter(t)
+                if plr then userId = plr.UserId; name = plr.DisplayName or plr.Name end
+            end
+        end
+        THName.Text = name
+        THAvatar.Image = userId > 0 and string_format("rbxthumb://type=AvatarHeadShot&id=%d&w=60&h=60", userId) or ""
+        THud.Visible = true
+        self:Update()
+    end
+
+    function TargetHUDAPI:Update()
+        if not self.Target or not self.Visible then return end
+        local char
+        if typeof(self.Target) == "Instance" then
+            if self.Target:IsA("Player") then char = self.Target.Character
+            elseif self.Target:IsA("Model") then char = self.Target end
+        end
+        if not char then return end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then THud.Visible = false; return end
+        local pct = math_clamp(hum.Health / math_max(hum.MaxHealth, 1), 0, 1)
+        Library.TweenObject(THHPBar, TweenInfo_new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2_new(pct, 0, 1, 0)})
+        THHPBar.BackgroundColor3 = Color3_fromRGB(math_floor((1-pct)*255), math_floor(pct*200), 0)
+        THHPText.Text = string_format("%d/%d", math_floor(hum.Health), math_floor(hum.MaxHealth))
+    end
+
+    Library.TargetHUDElement = TargetHUDAPI
+
+    function Library.CreateTargetHUD(opts)
+        return TargetHUDAPI
+    end
+end
+
