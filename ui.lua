@@ -92,9 +92,14 @@ function Library:OnKeybindChange(Fn)
 end;
 
 local AccentClock = 0;
+local _AccentLastOffset = -999;
 local _AccentConn = game:GetService("RunService").Heartbeat:Connect(function(Dt)
 	AccentClock = AccentClock + Dt * 0.8;
 	local Off = (AccentClock % 2) - 1;
+	-- Only update gradients if offset actually changed visually
+	local Rounded = math.floor(Off * 50 + 0.5) / 50;
+	if Rounded == _AccentLastOffset then return end;
+	_AccentLastOffset = Rounded;
 	local OffsetV = Vector2.new(Off, 0);
 	for _, G in Library.AccentGradients do
 		if G and G.Parent then
@@ -4820,7 +4825,7 @@ function Library:Window(Opts)
 				Name    = "Watermark Options";
 				Multi   = true;
 				Flag    = "WatermarkOpts";
-				Options = { "Title", "Fps", "Ping", "Game Name", "User ID", "LocalPlayer Name", "Date" };
+				Options = { "Title", "Fps", "Ping", "Game Name", "User ID", "LocalPlayer Name", "Display Name", "Server ID", "Player Count", "Uptime", "Place ID", "Date" };
 				Default = { "Title", "Fps", "Ping" };
 			});
 			SecHud:Slider({ Name = "Refresh Rate", Flag = "WatermarkRate", Min = 0, Max = 2, Step = 0.05, Decimals = 2, Default = 0.1 });
@@ -4831,7 +4836,9 @@ function Library:Window(Opts)
 
 			do
 				local LP = game:GetService("Players").LocalPlayer;
+				local Players_ = game:GetService("Players");
 				local Fps, FpsAcc, FpsCnt = 60, 0, 0;
+				local StartTime = tick();
 				Library:Connection(RunService.RenderStepped, function(Dt)
 					FpsCnt = FpsCnt + 1; FpsAcc = FpsAcc + Dt;
 					if FpsAcc >= 0.5 then
@@ -4860,6 +4867,16 @@ function Library:Window(Opts)
 					if Opts["Game Name"]       then table.insert(Parts, GameName) end;
 					if Opts["User ID"] and LP  then table.insert(Parts, tostring(LP.UserId)) end;
 					if Opts["LocalPlayer Name"] and LP then table.insert(Parts, LP.Name) end;
+					if Opts["Display Name"] and LP then table.insert(Parts, LP.DisplayName) end;
+					if Opts["Server ID"]       then table.insert(Parts, string.sub(game.JobId, 1, 8)) end;
+					if Opts["Player Count"]    then table.insert(Parts, tostring(#Players_:GetPlayers()) .. "/" .. tostring(Players_.MaxPlayers)) end;
+					if Opts["Uptime"]          then
+						local Elapsed = math.floor(tick() - StartTime);
+						local Mins = math.floor(Elapsed / 60);
+						local Secs = Elapsed % 60;
+						table.insert(Parts, string.format("%dm %02ds", Mins, Secs));
+					end;
+					if Opts["Place ID"]        then table.insert(Parts, tostring(game.PlaceId)) end;
 					if Opts.Date               then table.insert(Parts, os.date("%H:%M:%S")) end;
 					if #Parts > 0 then
 						local Body   = table.concat(Parts, " | ");
