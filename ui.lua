@@ -4844,7 +4844,7 @@ function Library:Window(Opts)
 			local SecHud = self:Section({ Name = "HUD", Side = "Right" });
 			SecHud:Toggle({
 				Name     = "Watermark", Default = true;
-				Callback = function(S) if Library._Watermark then Library._Watermark.Gui.Enabled = S end end;
+				Callback = function(S) if Library._Watermark and Library._Watermark.SetVisibility then Library._Watermark:SetVisibility(S) end end;
 			});
 			SecHud:Dropdown({
 				Name    = "Watermark Options";
@@ -4856,7 +4856,7 @@ function Library:Window(Opts)
 			SecHud:Slider({ Name = "Refresh Rate", Flag = "WatermarkRate", Min = 0, Max = 2, Step = 0.05, Decimals = 2, Default = 0.1 });
 			SecHud:Toggle({
 				Name     = "Keybind List", Default = true;
-				Callback = function(S) if Library._KeybindList then Library._KeybindList.Gui.Enabled = S end end;
+				Callback = function(S) if Library._KeybindList and Library._KeybindList.SetVisibility then Library._KeybindList:SetVisibility(S) end end;
 			});
 
 			do
@@ -4879,7 +4879,9 @@ function Library:Window(Opts)
 				local Acc = 0;
 				Library:Connection(RunService.Heartbeat, function(Dt)
 					local W = Library._Watermark;
-					if not (W and W.Gui and W.Gui.Enabled) then return end;
+					if not W then return end;
+					if not (W.Gui and W.Gui.Enabled) then return end;
+					if W.Frame and not W.Frame.Visible then return end;
 					local Rate = Library.Flags.WatermarkRate or 0.1;
 					Acc = Acc + Dt;
 					if Acc < Rate then return end;
@@ -5223,6 +5225,10 @@ function Library:KeybindList(Opts)
 	local Obj = { Gui = Gui, Frame = Frame, TitleLabel = TitleLbl };
 	function Obj:Refresh() Rebuild() end;
 	function Obj:SetTitle(NewTitle) TitleLbl.Text = string.upper(tostring(NewTitle)) end;
+	function Obj:SetVisibility(V)
+		Gui.Enabled = V;
+		Frame.Visible = V;
+	end;
 	function Obj:Destroy() Gui:Destroy() end;
 	Library._KeybindList = Obj;
 	return Obj;
@@ -5337,6 +5343,10 @@ function Library:Watermark(Opts)
 
 	local Obj = { Gui = Gui, Frame = Frame, Label = Lbl };
 	function Obj:SetText(NewText) Lbl.Text = tostring(NewText) end;
+	function Obj:SetVisibility(V)
+		Gui.Enabled = V;
+		Frame.Visible = V;
+	end;
 	function Obj:Destroy() Gui:Destroy() end;
 	Library._Watermark = Obj;
 	return Obj;
