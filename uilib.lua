@@ -220,21 +220,16 @@ getgenv().Library = {
 	Theme = {
 		Objects = {},
 		Default = {
-			Accent = Color3_fromRGB(200, 180, 255),
-			SecondAccent = Color3_fromRGB(140, 120, 200),
-			LightContrast = Color3_fromRGB(30, 30, 35),
-			DarkContrast = Color3_fromRGB(18, 18, 22),
-			Outline = Color3_fromRGB(0, 0, 0),
+			Accent = Color3_fromRGB(255, 255, 255),
+			SecondAccent = Color3_fromRGB(200, 200, 200),
+			LightContrast = Color3_fromRGB(25, 25, 25),
+			DarkContrast = Color3_fromRGB(15, 15, 15),
+			Outline = Color3_fromRGB(40, 40, 40),
 			TextColor = Color3_fromRGB(255, 255, 255),
-			TextDark = Color3_fromRGB(160, 160, 160),
+			TextDark = Color3_fromRGB(140, 140, 140),
 			Risky = Color3_fromRGB(251, 88, 88),
 		},
-		Presets = {
-			Default = {1, [[{"Accent":"c4e7ff","SecondAccent":"a2bfd3","LightContrast":"16191d","DarkContrast":"101215","InnerLightContrast":"22272c","InnerDarkContrast":"1c2025","Outline":"1c2025","Highlight":"303438","TextColor":"ffffff","TextDark":"8c8c8c","ImageColor":"ffffff","ImageDark":"8c8c8c","Risky":"fb8a8a"}]]},
-			Dracula = {2, [[{"Outline":"202026","Accent":"9a81b3","SecondAccent":"675276","TextColor":"b4b4b4","TextDark":"888888","LightContrast":"2a2a38","DarkContrast":"242430","InnerLightContrast":"393947","InnerDarkContrast":"2e2e3a","Highlight":"4d4d5b","Risky":"fb8a8a","ImageColor":"ffffff","ImageDark":"525062"}]]},
-			Red = {3, [[{"Outline":"0f0207","Accent":"af3264","SecondAccent":"722141","TextColor":"b4b4b4","TextDark":"888888","LightContrast":"1e0610","DarkContrast":"16040c","InnerLightContrast":"32111b","InnerDarkContrast":"2b0013","Highlight":"463135","Risky":"fb8a8a","ImageColor":"ffffff","ImageDark":"5c1a35"}]]},
-			Light = {4, [[{"Outline":"e6e6e6","Accent":"bb60d2","SecondAccent":"824493","TextColor":"000000","TextDark":"000000","LightContrast":"c3c3c3","DarkContrast":"d0d0d0","InnerLightContrast":"d7d7d7","InnerDarkContrast":"e3e3e3","Highlight":"ebebeb","Risky":"fb8a8a","ImageColor":"bb60d2","ImageDark":"a2a2a2"}]]},
-		},
+		Presets = {},
 	},
 }
 
