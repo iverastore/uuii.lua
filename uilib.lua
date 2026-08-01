@@ -1308,10 +1308,6 @@ do -- Elements
             end
 
             function Keybind.Toggle(UseToggle, Bool)
-                if UseToggle and not Options.Toggle.Value then
-                    return
-                end
-
                 if Bool ~= nil then
                     Keybind.Value = Bool
                 else
@@ -1326,11 +1322,15 @@ do -- Elements
                     end
                 end
 
-                if Options.Toggle.GetFlag then
-                    Library.Flags[Options.Toggle.GetFlag()] = Keybind
+                -- Actually toggle the parent Toggle UI to update its state and fire callback
+                if Options.Toggle and Options.Toggle.ToggleUI then
+                    Options.Toggle.ToggleUI(Keybind.Value)
+                else
+                    if Options.Toggle.GetFlag then
+                        Library.Flags[Options.Toggle.GetFlag()] = Keybind
+                    end
+                    Options.Toggle.GetCallback(Keybind.Value)
                 end
-                
-                Options.Toggle.GetCallback(Keybind.Value)
             end
 
             function Keybind.Get()
@@ -1413,6 +1413,93 @@ do -- Elements
                     end
 
                     Keybind.MouseLeave()
+                end)
+            end))
+
+            -- Right-click mode selection menu
+            Library.AddConnection(KeybindText.MouseButton2Click, LPH_NO_VIRTUALIZE(function()
+                if Library.MouseOverOtherWindow(Options.MainUI) then
+                    return
+                end
+
+                -- Destroy existing mode list if open
+                if Keybind.ModeList then
+                    pcall(function() Keybind.ModeList:Destroy() end)
+                    Keybind.ModeList = nil
+                    return
+                end
+
+                local Modes = {"Toggle", "Hold", "Always"}
+                local ModeMap = {["Toggle"] = "Toggle", ["Hold"] = "On Hold", ["Always"] = "Always"}
+
+                local ModeFrame = Library.CreateObject("Frame", {
+                    Name = "ModeList",
+                    Position = UDim2_new(0, 0, 1, 2),
+                    Size = UDim2_new(1, 20, 0, #Modes * 18 + 4),
+                    BackgroundColor3 = ThemeDefault.DarkContrast,
+                    BorderSizePixel = 0,
+                    ZIndex = 200,
+                    Parent = KeybindOutline
+                }); Library.AddTheme(ModeFrame, {BackgroundColor3 = "DarkContrast"})
+
+                Library.CreateObject("UIStroke", {
+                    Color = ThemeDefault.Outline, Thickness = 1, Parent = ModeFrame
+                })
+
+                Library.CreateObject("UIListLayout", {
+                    Padding = UDim_new(0, 0),
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Parent = ModeFrame
+                })
+
+                Library.CreateObject("UIPadding", {
+                    PaddingTop = UDim_new(0, 2), PaddingBottom = UDim_new(0, 2),
+                    PaddingLeft = UDim_new(0, 4), PaddingRight = UDim_new(0, 4),
+                    Parent = ModeFrame
+                })
+
+                Keybind.ModeList = ModeFrame
+                table_insert(UITable.ModeLists, ModeFrame)
+
+                for _, modeName in ipairs(Modes) do
+                    local isActive = (ModeMap[modeName] == Keybind.Mode)
+                    local ModeBtn = Library.CreateObject("TextButton", {
+                        Name = modeName,
+                        FontFace = UITable.Font,
+                        Text = modeName,
+                        TextColor3 = isActive and ThemeDefault.Accent or ThemeDefault.TextDark,
+                        TextSize = UITable.FontSize,
+                        Size = UDim2_new(1, 0, 0, 16),
+                        BackgroundTransparency = 1,
+                        BorderSizePixel = 0,
+                        AutoButtonColor = false,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        ZIndex = 201,
+                        Parent = ModeFrame
+                    })
+
+                    Library.AddConnection(ModeBtn.MouseButton1Click, function()
+                        Keybind.SetMode(ModeMap[modeName])
+                        -- Close the menu
+                        if Keybind.ModeList then
+                            pcall(function() Keybind.ModeList:Destroy() end)
+                            Keybind.ModeList = nil
+                        end
+                    end)
+                end
+
+                -- Close on click outside
+                task_delay(0.1, function()
+                    local closeConn
+                    closeConn = Library.AddConnection(UserInputService.InputBegan, function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
+                            if ModeFrame and ModeFrame.Parent and not Library.MouseOverFrame(ModeFrame) then
+                                pcall(function() ModeFrame:Destroy() end)
+                                Keybind.ModeList = nil
+                                if closeConn then closeConn:Disconnect() end
+                            end
+                        end
+                    end)
                 end)
             end))
 
@@ -7375,8 +7462,6 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
         Position = UDim2_new(0, 0, 0, 0), Parent = holder
     }); Library.AddTheme(SubNav, {BackgroundColor3 = "DarkContrast"})
 
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = SubNav})
-
     local SubNavLayout = Library.CreateObject("UIListLayout", {
         FillDirection = Enum.FillDirection.Horizontal,
         SortOrder = Enum.SortOrder.LayoutOrder,
@@ -7391,6 +7476,12 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
                 child:Destroy()
             elseif child:IsA("UIFlexItem") then
                 child:Destroy()
+            elseif child:IsA("UIPadding") then
+                -- Remove top padding so subtab bar is flush below tab bar
+                child.PaddingTop = UDim_new(0, 0)
+                child.PaddingLeft = UDim_new(0, 0)
+                child.PaddingRight = UDim_new(0, 0)
+                child.PaddingBottom = UDim_new(0, 0)
             elseif child:IsA("GuiObject") then
                 child.Visible = false
             end
@@ -7408,12 +7499,11 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
             BackgroundTransparency = 1, Size = UDim2_new(1 / #SubTabNames, 0, 1, 0),
             BorderSizePixel = 0, AutoButtonColor = false, Parent = SubNav
         }); Library.AddTheme(btn, {TextColor3 = "TextDark"})
-        Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = btn})
 
         -- Create holder frame for subtab content (left + right columns)
         local subHolder = Library.CreateObject("Frame", {
             Name = name .. "_Holder", BackgroundTransparency = 1,
-            Position = UDim2_new(0, 0, 0, 26), Size = UDim2_new(1, 0, 1, -26),
+            Position = UDim2_new(0, 0, 0, 22), Size = UDim2_new(1, 0, 1, -22),
             Visible = (i == 1), BorderSizePixel = 0, Parent = holder
         })
 
