@@ -331,7 +331,7 @@ do -- Functions
 	function Library.Error(Flag, Extra)
 		if Library.Errors[Flag] then return end
 		local LPH_LINE = nil
-		local ErrorMessage = string_format("âš ï¸ An error has occured:\n%s\n%s\nðŸ“ Trace: %s / %s", Flag, Extra or "", debug.traceback(), LPH_LINE or "No Line")
+		local ErrorMessage = string_format("âš ï¸ An error has occured:\n%s\n%s\nðŸ“ Trace: %s / %s", Flag, Extra or "", debug.traceback(), LPH_LINE or "No Line")
 
 		if Library.AddOutput then
 			Library.AddOutput(ErrorMessage, "Error")
@@ -7190,12 +7190,6 @@ end
 DefaultThemes = Library.GetTableIndexes(ThemeTable.Presets, true)
 Library.UpdateThemeList()
 
-
-
-
--- ═══════════════════════════════════════════════════════════════
--- WATERMARK
--- ═══════════════════════════════════════════════════════════════
 do
     local WM = Library.CreateObject("CanvasGroup", {
         Name = "Watermark", Position = UDim2_fromOffset(10, 10),
@@ -7247,9 +7241,6 @@ do
     Library.WatermarkFrame = WM
 end
 
--- ═══════════════════════════════════════════════════════════════
--- KEYBIND LIST
--- ═══════════════════════════════════════════════════════════════
 do
     local KL = Library.CreateObject("CanvasGroup", {
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
@@ -7296,15 +7287,12 @@ do
     function Library.SetKeybindListVisible(v) KL.Visible = v end
 end
 
--- ═══════════════════════════════════════════════════════════════
--- TARGET HUD (sharp, gradient HP, extra info)
--- ═══════════════════════════════════════════════════════════════
 do
     local TH = Library.CreateObject("CanvasGroup", {
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
         Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
         BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
-        Visible = false, Parent = UITable.ExtrasScreenGui
+        Visible = false, Parent = UITable.ScreenGui
     }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
     Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH})
 
@@ -7454,15 +7442,7 @@ do
     function Library.CreateTargetHUD(opts) return TargetHUDAPI end
 end
 
--- ═══════════════════════════════════════════════════════════════
--- SUBTAB SYSTEM
--- Creates sub-navigation within a tab (e.g. Combat > Aimbot | Silent | Aimbot+)
--- ═══════════════════════════════════════════════════════════════
 function Library.CreateSubTabs(ParentTab, SubTabNames)
-    -- ParentTab = WindowTab returned by CreateTab
-    -- SubTabNames = {"Aimbot", "Silent", "Aimbot+"}
-    -- Returns table of {Name = SubTabWrapper} for each subtab
-
     local holder = ParentTab.Holder
     if not holder then return {} end
 
@@ -7750,4 +7730,3 @@ function Library.CreateSubTabs(ParentTab, SubTabNames)
 
     return result
 end
-
