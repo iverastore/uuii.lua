@@ -7061,200 +7061,205 @@ DefaultThemes = Library.GetTableIndexes(ThemeTable.Presets, true)
 Library.UpdateThemeList()
 
 
+
+
 -- ═══════════════════════════════════════════════════════════════
--- WATERMARK (themed, auto-sizing)
+-- WATERMARK
 -- ═══════════════════════════════════════════════════════════════
 do
-    local WatermarkFrame = Library.CreateObject("CanvasGroup", {
-        Name = "Watermark",
-        Position = UDim2_fromOffset(10, 10),
-        Size = UDim2_new(0, 220, 0, 24),
-        BackgroundColor3 = ThemeDefault.DarkContrast,
-        BorderSizePixel = 0,
-        Visible = true,
-        Parent = UITable.ScreenGui
-    }); Library.AddTheme(WatermarkFrame, {BackgroundColor3 = "DarkContrast"})
+    local WM = Library.CreateObject("CanvasGroup", {
+        Name = "Watermark", Position = UDim2_fromOffset(10, 10),
+        Size = UDim2_new(0, 200, 0, 22), BackgroundColor3 = ThemeDefault.DarkContrast,
+        BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
+    }); Library.AddTheme(WM, {BackgroundColor3 = "DarkContrast"})
 
-    Library.CreateObject("UIStroke", {
-        Color = ThemeDefault.Outline,
-        Thickness = 1,
-        Parent = WatermarkFrame
-    })
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = WM})
 
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = WatermarkFrame})
-
-    local WMGrad = Library.CreateObject("Frame", {
-        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
-        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = WatermarkFrame
+    local WMAccent = Library.CreateObject("Frame", {
+        Name = "Accent", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = WM
     })
     Library.CreateObject("UIGradient", {
-        Rotation = 0,
         Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}),
-        Parent = WMGrad
+        Parent = WMAccent
     })
 
     local WMText = Library.CreateObject("TextLabel", {
-        Name = "Text", FontFace = UITable.Font, Text = UITable.UIName,
+        FontFace = UITable.Font, Text = UITable.UIName,
         TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
-        BackgroundTransparency = 1, Size = UDim2_new(1, 0, 1, 0),
-        Position = UDim2_new(0, 0, 0, 1), BorderSizePixel = 0, Parent = WatermarkFrame
+        BackgroundTransparency = 1, Size = UDim2_new(1, -10, 1, 0),
+        Position = UDim2_new(0, 5, 0, 1), TextXAlignment = Enum.TextXAlignment.Left,
+        BorderSizePixel = 0, Parent = WM
     }); Library.AddTheme(WMText, {TextColor3 = "TextColor"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = WMText})
-    Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,6), PaddingRight = UDim_new(0,6), Parent = WMText})
 
     task.spawn(function()
-        while task.wait(UITable.WatermarkRefreshRate or 0.15) do
-            if WatermarkFrame and WatermarkFrame.Parent and WatermarkFrame.Visible then
+        while task.wait(UITable.WatermarkRefreshRate or 0.5) do
+            if WM and WM.Parent and WM.Visible then
                 local fps = math_floor(1 / (RunService.RenderStepped:Wait() + 0.0001))
                 local ping = 0
-                pcall(function() local s = game:GetService("Stats"):FindFirstChild("PerformanceStats"); if s then local p = s:FindFirstChild("Ping"); if p then ping = math_floor(p.Value) end end end)
-                WMText.Text = string_format("%s | %dfps | %dms | %s", UITable.UIName, fps, ping, os_date("%H:%M:%S"))
-                local ts = game:GetService("TextService"):GetTextSize(WMText.Text, UITable.FontSize, Enum.Font.SourceSansBold, Vector2_new(1000, 24))
-                WatermarkFrame.Size = UDim2_new(0, ts.X + 18, 0, 24)
+                pcall(function() local s=game:GetService("Stats"):FindFirstChild("PerformanceStats"); if s then local p=s:FindFirstChild("Ping"); if p then ping=math_floor(p.Value) end end end)
+                WMText.Text = string_format("%s | %dfps | %dms | %s", UITable.UIName, fps, ping, os_date("%H:%M"))
+                local ts = game:GetService("TextService"):GetTextSize(WMText.Text, UITable.FontSize, Enum.Font.SourceSansBold, Vector2_new(800, 22))
+                WM.Size = UDim2_new(0, ts.X + 14, 0, 22)
             end
         end
     end)
 
-    function Library.SetWatermarkVisible(Bool) WatermarkFrame.Visible = Bool end
-    Library.WatermarkFrame = WatermarkFrame
+    function Library.SetWatermarkVisible(v) WM.Visible = v end
+    Library.WatermarkFrame = WM
 end
 
-
 -- ═══════════════════════════════════════════════════════════════
--- KEYBIND LIST (themed, right side)
+-- KEYBIND LIST
 -- ═══════════════════════════════════════════════════════════════
 do
-    local KLFrame = Library.CreateObject("CanvasGroup", {
+    local KL = Library.CreateObject("CanvasGroup", {
         Name = "KeybindList", AnchorPoint = Vector2_new(1, 0),
-        Position = UDim2_new(1, -10, 0, 45), Size = UDim2_new(0, 180, 0, 26),
+        Position = UDim2_new(1, -10, 0, 40), Size = UDim2_new(0, 170, 0, 20),
         AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = ThemeDefault.DarkContrast,
         BorderSizePixel = 0, Visible = true, Parent = UITable.ScreenGui
-    }); Library.AddTheme(KLFrame, {BackgroundColor3 = "DarkContrast"})
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KLFrame})
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = KLFrame})
+    }); Library.AddTheme(KL, {BackgroundColor3 = "DarkContrast"})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = KL})
 
-    local KLGrad = Library.CreateObject("Frame", {
-        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
-        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = KLFrame
+    local KLAccent = Library.CreateObject("Frame", {
+        Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = KL
     })
-    Library.CreateObject("UIGradient", {Rotation = 0, Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}), Parent = KLGrad})
+    Library.CreateObject("UIGradient", {
+        Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}),
+        Parent = KLAccent
+    })
 
     local KLTitle = Library.CreateObject("TextLabel", {
-        Name = "Title", FontFace = UITable.Font, Text = "Keybinds",
-        TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
-        BackgroundTransparency = 1, Size = UDim2_new(1, 0, 0, 22),
-        Position = UDim2_new(0,0,0,2), BorderSizePixel = 0, Parent = KLFrame
-    }); Library.AddTheme(KLTitle, {TextColor3 = "TextColor"})
+        FontFace = UITable.Font, Text = "keybinds",
+        TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize,
+        BackgroundTransparency = 1, Size = UDim2_new(1, 0, 0, 18),
+        Position = UDim2_new(0, 0, 0, 1), BorderSizePixel = 0, Parent = KL
+    }); Library.AddTheme(KLTitle, {TextColor3 = "TextDark"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = KLTitle})
 
     local KLHolder = Library.CreateObject("Frame", {
-        Name = "Holder", BackgroundTransparency = 1, Position = UDim2_new(0,0,0,24),
-        Size = UDim2_new(1,0,0,0), AutomaticSize = Enum.AutomaticSize.Y,
-        BorderSizePixel = 0, Parent = KLFrame
+        BackgroundTransparency = 1, Position = UDim2_new(0, 0, 0, 20),
+        Size = UDim2_new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
+        BorderSizePixel = 0, Parent = KL
     })
-    Library.CreateObject("UIListLayout", {Padding = UDim_new(0,1), SortOrder = Enum.SortOrder.LayoutOrder, Parent = KLHolder})
-    Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,6), PaddingRight = UDim_new(0,6), PaddingBottom = UDim_new(0,4), Parent = KLHolder})
+    Library.CreateObject("UIListLayout", {Padding = UDim_new(0,0), SortOrder = Enum.SortOrder.LayoutOrder, Parent = KLHolder})
+    Library.CreateObject("UIPadding", {PaddingLeft = UDim_new(0,4), PaddingRight = UDim_new(0,4), PaddingBottom = UDim_new(0,3), Parent = KLHolder})
 
-    UITable.KeybindListUI = KLFrame
-    UITable.KeybindListHolder = KLHolder
+    UITable.KeybindListUI = KL
 
-    function Library.SetKeybindListVisible(Bool) KLFrame.Visible = Bool end
-
-    function Library.RefreshKeybindList()
-        for _, c in KLHolder:GetChildren() do if c:IsA("Frame") then c:Destroy() end end
-        local any = false
-        for flag, obj in pairs(Library.Flags) do
-            if type(obj) == "table" and obj.KeybindKey and obj.Value == true then
-                any = true
-                local entry = Library.CreateObject("Frame", {
-                    Name = "KB", BackgroundTransparency = 1,
-                    Size = UDim2_new(1, 0, 0, 14), Parent = KLHolder
-                })
-                Library.CreateObject("TextLabel", {
-                    FontFace = UITable.Font, Text = obj.Name or flag,
-                    TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
-                    TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
-                    Size = UDim2_new(0.7,0,1,0), Parent = entry
-                })
-                Library.CreateObject("TextLabel", {
-                    FontFace = UITable.Font, Text = "[" .. tostring(obj.KeybindKey) .. "]",
-                    TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize,
-                    TextXAlignment = Enum.TextXAlignment.Right, BackgroundTransparency = 1,
-                    Size = UDim2_new(0.3,0,1,0), Position = UDim2_new(0.7,0,0,0), Parent = entry
-                })
-            end
-        end
-        if not any then KLFrame.Visible = false end
-    end
+    function Library.SetKeybindListVisible(v) KL.Visible = v end
 end
 
-
 -- ═══════════════════════════════════════════════════════════════
--- TARGET HUD (themed, centered top)
+-- TARGET HUD (sharp, gradient HP, extra info)
 -- ═══════════════════════════════════════════════════════════════
 do
-    local THud = Library.CreateObject("CanvasGroup", {
+    local TH = Library.CreateObject("CanvasGroup", {
         Name = "TargetHUD", AnchorPoint = Vector2_new(0.5, 0),
-        Position = UDim2_new(0.5, 0, 0, 80), Size = UDim2_new(0, 250, 0, 64),
+        Position = UDim2_new(0.5, 0, 0, 70), Size = UDim2_new(0, 260, 0, 72),
         BackgroundColor3 = ThemeDefault.DarkContrast, BorderSizePixel = 0,
         Visible = false, Parent = UITable.ScreenGui
-    }); Library.AddTheme(THud, {BackgroundColor3 = "DarkContrast"})
-    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THud})
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = THud})
+    }); Library.AddTheme(TH, {BackgroundColor3 = "DarkContrast"})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = TH})
 
-    local THGrad = Library.CreateObject("Frame", {
-        Name = "Grad", Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
-        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = THud
+    -- Top accent gradient line
+    local THAccent = Library.CreateObject("Frame", {
+        Size = UDim2_new(1, 0, 0, 1), BorderSizePixel = 0,
+        BackgroundColor3 = Color3_fromRGB(255,255,255), Parent = TH
     })
-    Library.CreateObject("UIGradient", {Rotation = 0, Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}), Parent = THGrad})
+    Library.CreateObject("UIGradient", {
+        Color = ColorSequence_new({ColorSequenceKeypoint_new(0, ThemeDefault.Accent), ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)}),
+        Parent = THAccent
+    })
 
+    -- Inner background
+    local THInner = Library.CreateObject("Frame", {
+        Name = "Inner", Position = UDim2_new(0, 1, 0, 2),
+        Size = UDim2_new(1, -2, 1, -3), BackgroundColor3 = ThemeDefault.DarkContrast,
+        BorderSizePixel = 0, BackgroundTransparency = 1, Parent = TH
+    })
+
+    -- Avatar
     local THAvatar = Library.CreateObject("ImageLabel", {
         Name = "Avatar", BackgroundColor3 = ThemeDefault.LightContrast,
-        BorderSizePixel = 0, Position = UDim2_new(0, 8, 0, 10),
-        Size = UDim2_new(0, 44, 0, 44), Image = "", Parent = THud
+        BorderSizePixel = 0, Position = UDim2_new(0, 6, 0, 6),
+        Size = UDim2_new(0, 48, 0, 48), Image = "", Parent = THInner
     }); Library.AddTheme(THAvatar, {BackgroundColor3 = "LightContrast"})
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 4), Parent = THAvatar})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THAvatar})
 
+    -- Name
     local THName = Library.CreateObject("TextLabel", {
-        Name = "Name", FontFace = UITable.Font, Text = "Target",
+        FontFace = UITable.Font, Text = "Target",
         TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize,
         TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
-        Position = UDim2_new(0, 60, 0, 8), Size = UDim2_new(1, -68, 0, 16), Parent = THud
+        Position = UDim2_new(0, 62, 0, 4), Size = UDim2_new(1, -68, 0, 14), Parent = THInner
     }); Library.AddTheme(THName, {TextColor3 = "TextColor"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THName})
 
+    -- HP Bar background
     local THHPBg = Library.CreateObject("Frame", {
-        Name = "HPBg", BackgroundColor3 = ThemeDefault.LightContrast,
-        BorderSizePixel = 0, Position = UDim2_new(0, 60, 0, 30),
-        Size = UDim2_new(1, -68, 0, 10), Parent = THud
+        BackgroundColor3 = ThemeDefault.LightContrast, BorderSizePixel = 0,
+        Position = UDim2_new(0, 62, 0, 22), Size = UDim2_new(1, -68, 0, 12), Parent = THInner
     }); Library.AddTheme(THHPBg, {BackgroundColor3 = "LightContrast"})
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 3), Parent = THHPBg})
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = THHPBg})
 
+    -- HP Bar fill with gradient
     local THHPBar = Library.CreateObject("Frame", {
-        Name = "HPBar", BackgroundColor3 = ThemeDefault.Accent,
-        BorderSizePixel = 0, Size = UDim2_new(1, 0, 1, 0), Parent = THHPBg
-    }); Library.AddTheme(THHPBar, {BackgroundColor3 = "Accent"})
-    Library.CreateObject("UICorner", {CornerRadius = UDim_new(0, 3), Parent = THHPBar})
+        BackgroundColor3 = Color3_fromRGB(255,255,255), BorderSizePixel = 0,
+        Size = UDim2_new(1, 0, 1, 0), Parent = THHPBg
+    })
+    local THHPGradient = Library.CreateObject("UIGradient", {
+        Color = ColorSequence_new({
+            ColorSequenceKeypoint_new(0, ThemeDefault.Accent),
+            ColorSequenceKeypoint_new(1, ThemeDefault.SecondAccent)
+        }),
+        Parent = THHPBar
+    })
 
+    -- HP Text
     local THHPText = Library.CreateObject("TextLabel", {
-        Name = "HPText", FontFace = UITable.Font, Text = "100/100",
-        TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
+        FontFace = UITable.Font, Text = "100 / 100",
+        TextColor3 = ThemeDefault.TextColor, TextSize = UITable.FontSize - 1,
         TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
-        Position = UDim2_new(0, 60, 0, 44), Size = UDim2_new(1, -68, 0, 14), Parent = THud
-    }); Library.AddTheme(THHPText, {TextColor3 = "TextDark"})
+        Position = UDim2_new(0, 62, 0, 38), Size = UDim2_new(0.5, -32, 0, 12), Parent = THInner
+    }); Library.AddTheme(THHPText, {TextColor3 = "TextColor"})
     Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THHPText})
 
+    -- Distance text
+    local THDist = Library.CreateObject("TextLabel", {
+        FontFace = UITable.Font, Text = "0m",
+        TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
+        TextXAlignment = Enum.TextXAlignment.Right, BackgroundTransparency = 1,
+        Position = UDim2_new(0.5, 0, 0, 38), Size = UDim2_new(0.5, -68, 0, 12),
+        AnchorPoint = Vector2_new(0, 0), Parent = THInner
+    }); Library.AddTheme(THDist, {TextColor3 = "TextDark"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THDist})
+
+    -- Weapon text
+    local THWeapon = Library.CreateObject("TextLabel", {
+        FontFace = UITable.Font, Text = "",
+        TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize - 1,
+        TextXAlignment = Enum.TextXAlignment.Left, BackgroundTransparency = 1,
+        Position = UDim2_new(0, 62, 0, 52), Size = UDim2_new(1, -68, 0, 12), Parent = THInner
+    }); Library.AddTheme(THWeapon, {TextColor3 = "TextDark"})
+    Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = THWeapon})
+
+    -- Draggable
+    Library.Draggable(TH, TH)
+
     -- API
-    local TargetHUDAPI = {Visible = false, Target = nil, Items = {Container = THud}}
+    local TargetHUDAPI = {Visible = false, Target = nil, Items = {Container = TH}}
 
     function TargetHUDAPI:SetVisibility(v)
         self.Visible = v
-        if not v then THud.Visible = false end
+        if not v then TH.Visible = false end
     end
 
     function TargetHUDAPI:SetTarget(t)
         self.Target = t
-        if not t or not self.Visible then THud.Visible = false; return end
+        if not t or not self.Visible then TH.Visible = false; return end
         local name, userId, char = "Unknown", 0, nil
         if typeof(t) == "Instance" then
             if t:IsA("Player") then name = t.DisplayName or t.Name; userId = t.UserId; char = t.Character
@@ -7266,7 +7271,7 @@ do
         end
         THName.Text = name
         THAvatar.Image = userId > 0 and string_format("rbxthumb://type=AvatarHeadShot&id=%d&w=60&h=60", userId) or ""
-        THud.Visible = true
+        TH.Visible = true
         self:Update()
     end
 
@@ -7279,17 +7284,156 @@ do
         end
         if not char then return end
         local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum then THud.Visible = false; return end
+        if not hum then TH.Visible = false; return end
         local pct = math_clamp(hum.Health / math_max(hum.MaxHealth, 1), 0, 1)
-        Library.TweenObject(THHPBar, TweenInfo_new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2_new(pct, 0, 1, 0)})
-        THHPBar.BackgroundColor3 = Color3_fromRGB(math_floor((1-pct)*255), math_floor(pct*200), 0)
-        THHPText.Text = string_format("%d/%d", math_floor(hum.Health), math_floor(hum.MaxHealth))
+        Library.TweenObject(THHPBar, TweenInfo_new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2_new(pct, 0, 1, 0)})
+        THHPText.Text = string_format("%d / %d", math_floor(hum.Health), math_floor(hum.MaxHealth))
+        -- Distance
+        local myChar = Client.Character
+        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if myHrp and hrp then
+            THDist.Text = string_format("%dm", math_floor((myHrp.Position - hrp.Position).Magnitude))
+        end
+        -- Weapon
+        local tool = char:FindFirstChildOfClass("Tool")
+        THWeapon.Text = tool and tool.Name or ""
     end
 
     Library.TargetHUDElement = TargetHUDAPI
 
-    function Library.CreateTargetHUD(opts)
-        return TargetHUDAPI
+    function Library.CreateTargetHUD(opts) return TargetHUDAPI end
+end
+
+-- ═══════════════════════════════════════════════════════════════
+-- SUBTAB SYSTEM
+-- Creates sub-navigation within a tab (e.g. Combat > Aimbot | Silent | Aimbot+)
+-- ═══════════════════════════════════════════════════════════════
+function Library.CreateSubTabs(ParentTab, SubTabNames)
+    -- ParentTab = WindowTab returned by CreateTab
+    -- SubTabNames = {"Aimbot", "Silent", "Aimbot+"}
+    -- Returns table of {Name = SectionWrapper} for each subtab
+
+    local holder = ParentTab.Holder
+    if not holder then return {} end
+
+    -- Create subtab navigation bar at top of tab content
+    local SubNav = Library.CreateObject("Frame", {
+        Name = "SubNav", BackgroundColor3 = ThemeDefault.DarkContrast,
+        BorderSizePixel = 0, Size = UDim2_new(1, 0, 0, 22),
+        Position = UDim2_new(0, 0, 0, 0), Parent = holder
+    }); Library.AddTheme(SubNav, {BackgroundColor3 = "DarkContrast"})
+
+    Library.CreateObject("UIStroke", {Color = ThemeDefault.Outline, Thickness = 1, Parent = SubNav})
+
+    local SubNavLayout = Library.CreateObject("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = SubNav
+    })
+
+    -- Move existing content down to make room
+    for _, child in holder:GetChildren() do
+        if child ~= SubNav and child:IsA("GuiObject") then
+            child.Position = child.Position + UDim2_new(0, 0, 0, 26)
+            child.Size = child.Size - UDim2_new(0, 0, 0, 26)
+        end
     end
+
+    local subTabs = {}
+    local subHolders = {}
+    local activeSubTab = nil
+
+    for i, name in ipairs(SubTabNames) do
+        -- Create button for each subtab
+        local btn = Library.CreateObject("TextButton", {
+            Name = name, FontFace = UITable.Font, Text = name,
+            TextColor3 = ThemeDefault.TextDark, TextSize = UITable.FontSize,
+            BackgroundTransparency = 1, Size = UDim2_new(1 / #SubTabNames, 0, 1, 0),
+            BorderSizePixel = 0, AutoButtonColor = false, Parent = SubNav
+        }); Library.AddTheme(btn, {TextColor3 = "TextDark"})
+        Library.CreateObject("UIStroke", {LineJoinMode = Enum.LineJoinMode.Miter, Parent = btn})
+
+        -- Create holder frame for subtab content (left + right columns)
+        local subHolder = Library.CreateObject("Frame", {
+            Name = name .. "_Holder", BackgroundTransparency = 1,
+            Position = UDim2_new(0, 0, 0, 26), Size = UDim2_new(1, 0, 1, -26),
+            Visible = (i == 1), BorderSizePixel = 0, Parent = holder
+        })
+
+        local subLeft = Library.CreateObject("Frame", {
+            BackgroundTransparency = 1, Name = "Left",
+            Size = UDim2_new(1, 0, 1, 0), BorderSizePixel = 0, Parent = subHolder
+        })
+        Library.CreateObject("UIFlexItem", {FlexMode = Enum.UIFlexMode.Fill, Parent = subLeft})
+        Library.CreateObject("UIListLayout", {Padding = UDim_new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = subLeft})
+
+        local subRight = Library.CreateObject("Frame", {
+            BackgroundTransparency = 1, Name = "Right",
+            Size = UDim2_new(1, 0, 1, 0), BorderSizePixel = 0, Parent = subHolder
+        })
+        Library.CreateObject("UIFlexItem", {FlexMode = Enum.UIFlexMode.Fill, Parent = subRight})
+        Library.CreateObject("UIListLayout", {Padding = UDim_new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = subRight})
+
+        Library.CreateObject("UIListLayout", {
+            FillDirection = Enum.FillDirection.Horizontal,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim_new(0, 10), Parent = subHolder
+        })
+
+        Library.CreateObject("UIPadding", {
+            PaddingTop = UDim_new(0, 10), PaddingBottom = UDim_new(0, 10),
+            PaddingRight = UDim_new(0, 10), PaddingLeft = UDim_new(0, 10),
+            Parent = subHolder
+        })
+
+        subHolders[name] = {holder = subHolder, left = subLeft, right = subRight, btn = btn}
+
+        -- Click handler
+        Library.AddConnection(btn.MouseButton1Click, function()
+            if activeSubTab == name then return end
+            -- Deactivate current
+            if activeSubTab and subHolders[activeSubTab] then
+                subHolders[activeSubTab].holder.Visible = false
+                Library.TweenObject(subHolders[activeSubTab].btn, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {TextColor3 = ThemeDefault.TextDark})
+            end
+            -- Activate new
+            activeSubTab = name
+            subHolders[name].holder.Visible = true
+            Library.TweenObject(btn, TweenInfo_new(UITable.TweenSpeed, UITable.TweenEasingStyle, Enum.EasingDirection.Out), {TextColor3 = ThemeDefault.TextColor})
+        end)
+
+        if i == 1 then
+            activeSubTab = name
+            btn.TextColor3 = ThemeDefault.TextColor
+        end
+    end
+
+    -- Return section creators for each subtab
+    local result = {}
+    for name, data in pairs(subHolders) do
+        result[name] = {
+            Left = data.left,
+            Right = data.right,
+            Section = function(opts)
+                opts = opts or {}
+                local side = opts.Side or "Left"
+                if side == 1 then side = "Left" elseif side == 2 then side = "Right" end
+                local parent = side == "Right" and data.right or data.left
+                local Section = Library.CreateObject("Frame", {
+                    Name = opts.Name or "Section",
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    BackgroundColor3 = ThemeDefault.DarkContrast,
+                    BorderSizePixel = 0, Size = UDim2_new(1, 0, 0, 0),
+                    Parent = parent
+                }); Library.AddTheme(Section, {BackgroundColor3 = "DarkContrast"})
+                -- This hooks into the existing Sections system
+                -- For now return the parent section creator
+                return parent
+            end,
+        }
+    end
+
+    return result
 end
 
