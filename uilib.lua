@@ -891,7 +891,7 @@ do -- Functions
         return Length
     end
 
-    function Library.Notify(optsOrSelf, optsOrDur)
+    function Library.Notify(optsOrSelf, optsOrDur, durArg)
         -- Handles both Library.Notify({Message=...}) and Library:Notify("msg", dur)
         local msg, delay
         if type(optsOrSelf) == "table" and optsOrSelf.Message then
@@ -905,11 +905,10 @@ do -- Functions
             delay = optsOrDur.Delay or 5
         elseif type(optsOrDur) == "string" then
             msg = optsOrDur
-            delay = 5
+            delay = durArg or 5
         else
             return
         end
-        -- Simple notification: print to output + brief on-screen text
         pcall(function() warn("[alternate] " .. tostring(msg)) end)
     end
 
