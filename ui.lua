@@ -897,14 +897,6 @@ function Library:Window(Opts)
 		end;
 		Gradient.Enabled = true;
 		ApplyGrad();
-		Library:Connection(RunService.Heartbeat, function(Dt)
-			if math.abs(GradTarget - GradT) < 0.001 then
-				if GradT ~= GradTarget then GradT = GradTarget; ApplyGrad() end;
-				return;
-			end;
-			GradT = GradT + (GradTarget - GradT) * (1 - math.exp(-Dt * 16));
-			ApplyGrad();
-		end);
 
 		function TabRef:SetActive(State)
 			self.Active = State;
@@ -917,7 +909,7 @@ function Library:Window(Opts)
 					Position = UDim2.new(0, Lo, 0, 1);
 					Size     = UDim2.new(1, -Lo - Ro, 1, -1);
 				}):Play();
-				GradTarget          = 1;
+				GradTarget = 1; GradT = 1; ApplyGrad();
 				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
 				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("FFFFFF") }):Play();
 				TopGradient.Position = UDim2.new(0, 0, 0, 0);
@@ -932,7 +924,7 @@ function Library:Window(Opts)
 					Position = UDim2.new(0, 0, 0, 0);
 					Size     = UDim2.new(1, 0, 1, 0);
 				}):Play();
-				GradTarget          = 0;
+				GradTarget = 0; GradT = 0; ApplyGrad();
 				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
 				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("606060") }):Play();
 			end;
@@ -1571,17 +1563,6 @@ function Library:Window(Opts)
 							});
 						end;
 						ApplyGrad();
-						Library:Connection(RunService.Heartbeat, function(Dt)
-							if math.abs(Entry.GradTarget - Entry.GradT) < 0.001 then
-								if Entry.GradT ~= Entry.GradTarget then
-									Entry.GradT = Entry.GradTarget;
-									ApplyGrad();
-								end;
-								return;
-							end;
-							Entry.GradT = Entry.GradT + (Entry.GradTarget - Entry.GradT) * (1 - math.exp(-Dt * 16));
-							ApplyGrad();
-						end);
 						table.insert(TabButtons, Entry);
 						return Btn;
 					end;
@@ -1591,16 +1572,16 @@ function Library:Window(Opts)
 					local function SetCpTab(I)
 						for i, T in TabButtons do
 							if i == I then
-								T.GradTarget = 1;
-								Library:Tween(T.TopGradient, CpAnimInfo, { BackgroundTransparency = 0 }):Play();
+								T.GradTarget = 1; T.GradT = 1;
+								T.TopGradient.BackgroundTransparency = 0;
 								for _, N in CpOutlineNames do
-									Library:Tween(T[N], CpAnimInfo, { BackgroundTransparency = 1 }):Play();
+									T[N].BackgroundTransparency = 1;
 								end;
 							else
-								T.GradTarget = 0;
-								Library:Tween(T.TopGradient, CpAnimInfo, { BackgroundTransparency = 1 }):Play();
+								T.GradTarget = 0; T.GradT = 0;
+								T.TopGradient.BackgroundTransparency = 1;
 								for _, N in CpOutlineNames do
-									Library:Tween(T[N], CpAnimInfo, { BackgroundTransparency = 0 }):Play();
+									T[N].BackgroundTransparency = 0;
 								end;
 							end;
 						end;
@@ -2758,17 +2739,6 @@ function Library:Window(Opts)
 						});
 					end;
 					ApplyGrad();
-					Library:Connection(RunService.Heartbeat, function(Dt)
-						if math.abs(Entry.GradTarget - Entry.GradT) < 0.001 then
-							if Entry.GradT ~= Entry.GradTarget then
-								Entry.GradT = Entry.GradTarget;
-								ApplyGrad();
-							end;
-							return;
-						end;
-						Entry.GradT = Entry.GradT + (Entry.GradTarget - Entry.GradT) * (1 - math.exp(-Dt * 16));
-						ApplyGrad();
-					end);
 					table.insert(TabButtons, Entry);
 					return Btn;
 				end;
@@ -2778,16 +2748,16 @@ function Library:Window(Opts)
 				local function SetCpTab(I)
 					for i, T in TabButtons do
 						if i == I then
-							T.GradTarget = 1;
-							Library:Tween(T.TopGradient, CpAnimInfo, { BackgroundTransparency = 0 }):Play();
+							T.GradTarget = 1; T.GradT = 1;
+							T.TopGradient.BackgroundTransparency = 0;
 							for _, N in CpOutlineNames do
-								Library:Tween(T[N], CpAnimInfo, { BackgroundTransparency = 1 }):Play();
+								T[N].BackgroundTransparency = 1;
 							end;
 						else
-							T.GradTarget = 0;
-							Library:Tween(T.TopGradient, CpAnimInfo, { BackgroundTransparency = 1 }):Play();
+							T.GradTarget = 0; T.GradT = 0;
+							T.TopGradient.BackgroundTransparency = 1;
 							for _, N in CpOutlineNames do
-								Library:Tween(T[N], CpAnimInfo, { BackgroundTransparency = 0 }):Play();
+								T[N].BackgroundTransparency = 0;
 							end;
 						end;
 					end;
