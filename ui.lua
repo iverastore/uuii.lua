@@ -92,11 +92,7 @@ function Library:OnKeybindChange(Fn)
 end;
 
 local AccentClock = 0;
-local AccentFrameTimer = 0;
-game:GetService("RunService").Heartbeat:Connect(function(Dt)
-	AccentFrameTimer = AccentFrameTimer + Dt;
-	if AccentFrameTimer < 0.033 then return end;
-	AccentFrameTimer = 0;
+Library:Connection(game:GetService("RunService").Heartbeat, function(Dt)
 	AccentClock = AccentClock + Dt * 0.8;
 	local Off = (AccentClock % 2) - 1;
 	local OffsetV = Vector2.new(Off, 0);
@@ -928,6 +924,138 @@ function Library:Window(Opts)
 				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
 				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("606060") }):Play();
 			end;
+		end;
+
+		TabRef._SubTabs = {};
+		TabRef._SubTabBar = nil;
+		TabRef._ActiveSubTab = nil;
+
+		function TabRef:SubTab(Name)
+			Name = tostring(Name or "SubTab");
+
+			if not self._SubTabBar then
+				self._SubTabBar = Library:CreateInstance("Frame", {
+					Name = "SubTabBar";
+					Parent = self.Page;
+					Position = UDim2.new(0, 0, 0, -8);
+					Size = UDim2.new(1, 0, 0, 20);
+					BackgroundTransparency = 1;
+					BorderSizePixel = 0;
+					ZIndex = 10;
+				});
+				Library:CreateInstance("UIListLayout", {
+					Parent = self._SubTabBar;
+					FillDirection = Enum.FillDirection.Horizontal;
+					SortOrder = Enum.SortOrder.LayoutOrder;
+					Padding = UDim.new(0, 0);
+				});
+				self.Left.Position = UDim2.new(0, 0, 0, 14);
+				self.Left.Size = UDim2.new(0.5, -3, 1, -14);
+				self.Right.Position = UDim2.new(1, 0, 0, 14);
+				self.Right.Size = UDim2.new(0.5, -3, 1, -14);
+			end;
+
+			local SubBtn = Library:CreateInstance("TextButton", {
+				Name = "SubTab_" .. Name;
+				Parent = self._SubTabBar;
+				Size = UDim2.new(1 / math.max(#self._SubTabs + 1, 1), 0, 1, 0);
+				BackgroundColor3 = Color3.fromHex("0a0a0a");
+				BorderSizePixel = 0;
+				AutoButtonColor = false;
+				Text = Name;
+				TextColor3 = Color3.fromHex("505050");
+				TextSize = 11;
+			});
+			if ProggyCleanFont then SubBtn.FontFace = ProggyCleanFont end;
+
+			local SubTopLine = Library:CreateInstance("Frame", {
+				Name = "TopLine";
+				Parent = SubBtn;
+				Position = UDim2.new(0, 0, 0, 0);
+				Size = UDim2.new(1, 0, 0, 1);
+				BackgroundColor3 = Color3.fromHex("FFFFFF");
+				BackgroundTransparency = 1;
+				BorderSizePixel = 0;
+				ZIndex = 5;
+			});
+			local SubGrad = Library:CreateInstance("UIGradient", { Parent = SubTopLine; Rotation = 0 });
+			Library:RegisterAccentGradient(SubGrad);
+
+			local SubLeft = Library:CreateInstance("ScrollingFrame", {
+				Name = "Left";
+				Parent = self.Page;
+				Position = UDim2.new(0, 0, 0, 14);
+				Size = UDim2.new(0.5, -3, 1, -14);
+				BackgroundTransparency = 1;
+				BorderSizePixel = 0;
+				CanvasSize = UDim2.new(0, 0, 0, 0);
+				AutomaticCanvasSize = Enum.AutomaticSize.Y;
+				ScrollBarThickness = 0;
+				ScrollingDirection = Enum.ScrollingDirection.Y;
+				Visible = false;
+			});
+			Library:CreateInstance("UIListLayout", { Parent = SubLeft; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder });
+			Library:CreateInstance("UIPadding", { Parent = SubLeft; PaddingTop = UDim.new(0, 4); PaddingBottom = UDim.new(0, 6) });
+
+			local SubRight = Library:CreateInstance("ScrollingFrame", {
+				Name = "Right";
+				Parent = self.Page;
+				AnchorPoint = Vector2.new(1, 0);
+				Position = UDim2.new(1, 0, 0, 14);
+				Size = UDim2.new(0.5, -3, 1, -14);
+				BackgroundTransparency = 1;
+				BorderSizePixel = 0;
+				CanvasSize = UDim2.new(0, 0, 0, 0);
+				AutomaticCanvasSize = Enum.AutomaticSize.Y;
+				ScrollBarThickness = 0;
+				ScrollingDirection = Enum.ScrollingDirection.Y;
+				Visible = false;
+			});
+			Library:CreateInstance("UIListLayout", { Parent = SubRight; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder });
+			Library:CreateInstance("UIPadding", { Parent = SubRight; PaddingTop = UDim.new(0, 4); PaddingBottom = UDim.new(0, 6) });
+
+			local SubTabRef = { Name = Name, Btn = SubBtn, Left = SubLeft, Right = SubRight, TopLine = SubTopLine, Page = self.Page };
+			table.insert(self._SubTabs, SubTabRef);
+
+			for _, st in self._SubTabs do
+				st.Btn.Size = UDim2.new(1 / #self._SubTabs, 0, 1, 0);
+			end;
+
+			local function ActivateSubTab()
+				for _, st in self._SubTabs do
+					if st == SubTabRef then
+						st.Left.Visible = true;
+						st.Right.Visible = true;
+						st.Btn.TextColor3 = Color3.fromHex("FFFFFF");
+						st.TopLine.BackgroundTransparency = 0;
+					else
+						st.Left.Visible = false;
+						st.Right.Visible = false;
+						st.Btn.TextColor3 = Color3.fromHex("505050");
+						st.TopLine.BackgroundTransparency = 1;
+					end;
+				end;
+				self._ActiveSubTab = SubTabRef;
+			end;
+
+			Library:Connection(SubBtn.MouseButton1Click, ActivateSubTab);
+
+			if #self._SubTabs == 1 then
+				self.Left.Visible = false;
+				self.Right.Visible = false;
+				ActivateSubTab();
+			end;
+
+			SubTabRef.Section = function(_, SecOpts)
+				SecOpts = typeof(SecOpts) == "table" and SecOpts or { Name = tostring(SecOpts) };
+				local Side = string.lower(tostring(SecOpts.Side or "Left"));
+				SecOpts.Side = Side;
+				local FakeTab = { Left = SubLeft, Right = SubRight, Page = self.Page };
+				setmetatable(FakeTab, { __index = TabRef });
+				return TabRef.Section(FakeTab, SecOpts);
+			end;
+
+			return SubTabRef;
 		end;
 
 		function TabRef:Section(SecOpts)
