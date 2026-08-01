@@ -555,7 +555,7 @@ function Library:Window(Opts)
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	});
 
-	local Outer = self:CreateInstance("Frame", {
+	local Outer = self:CreateInstance("CanvasGroup", {
 		Name = "Outer";
 		Parent = Gui;
 		AnchorPoint = Vector2.new(0.5, 0.5);
@@ -4921,29 +4921,14 @@ function Library:Window(Opts)
 	function Window:SetVisible(State)
 		if self.Visible == State then return end;
 		self.Visible = State and true or false;
-		self._FadeToken = self._FadeToken + 1;
+		self._FadeToken = (self._FadeToken or 0) + 1;
 		local Mine = self._FadeToken;
-		if not self._FadeOriginals then
-			self._FadeOriginals = CaptureOriginals();
-		end;
 		local Info = TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
 		if self.Visible then
 			Gui.Enabled = true;
-			for Inst, PMap in self._FadeOriginals do
-				if Inst.Parent then
-					local Goal = {};
-					for P, V in PMap do Goal[P] = V end;
-					Library:Tween(Inst, Info, Goal):Play();
-				end;
-			end;
+			Library:Tween(Outer, Info, { GroupTransparency = 0 }):Play();
 		else
-			for Inst, PMap in self._FadeOriginals do
-				if Inst.Parent then
-					local Goal = {};
-					for P in PMap do Goal[P] = 1 end;
-					Library:Tween(Inst, Info, Goal):Play();
-				end;
-			end;
+			Library:Tween(Outer, Info, { GroupTransparency = 1 }):Play();
 			task.delay(Info.Time, function()
 				if self._FadeToken == Mine and not self.Visible then
 					Gui.Enabled = false;
