@@ -1447,14 +1447,14 @@ function Library:Window(Opts)
 						});
 						local ModePopup = Library:CreateInstance("Frame", {
 							Parent = PopupGui;
-							Size = UDim2.fromOffset(80, 70);
+							Size = UDim2.fromOffset(90, 84);
 							Position = UDim2.fromOffset(KBtn.AbsolutePosition.X, KBtn.AbsolutePosition.Y + KBtn.AbsoluteSize.Y + 2);
 							BackgroundColor3 = Color3.fromHex("141414");
 							BorderSizePixel = 0;
 						});
 						Library:CreateInstance("UIStroke", { Parent = ModePopup; Color = Color3.fromHex("333333"); Thickness = 1 });
-						Library:CreateInstance("UIListLayout", { Parent = ModePopup; Padding = UDim.new(0, 0); SortOrder = Enum.SortOrder.LayoutOrder });
-						Library:CreateInstance("UIPadding", { Parent = ModePopup; PaddingTop = UDim.new(0, 3); PaddingBottom = UDim.new(0, 3); PaddingLeft = UDim.new(0, 5) });
+						Library:CreateInstance("UIListLayout", { Parent = ModePopup; Padding = UDim.new(0, 1); SortOrder = Enum.SortOrder.LayoutOrder });
+						Library:CreateInstance("UIPadding", { Parent = ModePopup; PaddingTop = UDim.new(0, 4); PaddingBottom = UDim.new(0, 4); PaddingLeft = UDim.new(0, 6); PaddingRight = UDim.new(0, 6) });
 						local modes = {"Toggle", "Hold", "Always", "None"};
 						local popupClosed = false;
 						local function ClosePopup()
@@ -1464,12 +1464,22 @@ function Library:Window(Opts)
 						end;
 						for _, m in modes do
 							local mb = Library:CreateInstance("TextButton", {
-								Parent = ModePopup; Size = UDim2.new(1, 0, 0, 15);
-								BackgroundTransparency = 1; BorderSizePixel = 0; AutoButtonColor = false;
+								Parent = ModePopup; Size = UDim2.new(1, 0, 0, 18);
+								BackgroundColor3 = Color3.fromHex("1a1a1a");
+								BackgroundTransparency = 1;
+								BorderSizePixel = 0; AutoButtonColor = false;
 								Text = m; TextColor3 = (m:lower() == BindMode) and Color3.fromHex("FFFFFF") or Color3.fromHex("888888");
-								TextSize = 11; TextXAlignment = Enum.TextXAlignment.Left;
+								TextSize = 12; TextXAlignment = Enum.TextXAlignment.Left;
 							});
 							if ProggyCleanFont then mb.FontFace = ProggyCleanFont end;
+							mb.MouseEnter:Connect(function()
+								mb.BackgroundTransparency = 0.5;
+								mb.TextColor3 = Color3.fromHex("FFFFFF");
+							end);
+							mb.MouseLeave:Connect(function()
+								mb.BackgroundTransparency = 1;
+								mb.TextColor3 = (m:lower() == BindMode) and Color3.fromHex("FFFFFF") or Color3.fromHex("888888");
+							end);
 							mb.MouseButton1Click:Connect(function()
 								if m == "None" then
 									Key = nil;
@@ -1483,7 +1493,7 @@ function Library:Window(Opts)
 							end);
 						end;
 						local closeConn;
-						task.delay(0.2, function()
+						task.delay(0.25, function()
 							if popupClosed then return end;
 							closeConn = UserInputService.InputBegan:Connect(function(Input)
 								if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
@@ -4369,7 +4379,7 @@ function Library:Window(Opts)
 				for I, M in ModeOpts do
 					local Btn = Library:CreateInstance("TextButton", {
 						Parent                 = PopupInside;
-						Size                   = UDim2.new(1, 0, 0, 14);
+						Size                   = UDim2.new(1, 0, 0, 18);
 						BackgroundTransparency = 1;
 						BorderSizePixel        = 0;
 						AutoButtonColor        = false;
@@ -4382,6 +4392,13 @@ function Library:Window(Opts)
 					Library:CreateInstance("UIPadding", { Parent = Btn; PaddingLeft = UDim.new(0, 6) });
 					if ProggyCleanFont then Btn.FontFace = ProggyCleanFont end;
 					ModeBtns[M:lower()] = Btn;
+					Btn.MouseEnter:Connect(function()
+						Btn.BackgroundTransparency = 0.5;
+						Btn.BackgroundColor3 = Color3.fromHex("2a2a2a");
+					end);
+					Btn.MouseLeave:Connect(function()
+						Btn.BackgroundTransparency = 1;
+					end);
 					Btn.MouseButton1Click:Connect(function()
 						Mode = M:lower();
 						if Mode == "always" then
@@ -4403,12 +4420,13 @@ function Library:Window(Opts)
 					if Input.UserInputType ~= Enum.UserInputType.MouseButton1
 						and Input.UserInputType ~= Enum.UserInputType.MouseButton2 then return end;
 					local M = UserInputService:GetMouseLocation();
+					local Mx, My = M.X, M.Y - GuiInset;
 					local Ap = Popup.AbsolutePosition;
 					local Sz = Popup.AbsoluteSize;
-					if M.X < Ap.X or M.Y < Ap.Y or M.X > Ap.X + Sz.X or M.Y > Ap.Y + Sz.Y then
+					if Mx < Ap.X or My < Ap.Y or Mx > Ap.X + Sz.X or My > Ap.Y + Sz.Y then
 						local Bp = Box.AbsolutePosition;
 						local Bs = Box.AbsoluteSize;
-						if M.X < Bp.X or M.Y < Bp.Y or M.X > Bp.X + Bs.X or M.Y > Bp.Y + Bs.Y then
+						if Mx < Bp.X or My < Bp.Y or Mx > Bp.X + Bs.X or My > Bp.Y + Bs.Y then
 							ClosePopup();
 						end;
 					end;
