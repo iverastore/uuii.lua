@@ -40,8 +40,8 @@ local Palette = {
 		InnerOutline = Color3.fromHex("333333");
 		TitleTop = Color3.fromHex("e8e8e8");
 		TitleBottom = Color3.fromHex("808080");
-		TabActive = Color3.fromHex("c41e3a");
-		Accent = Color3.fromHex("c41e3a");
+		TabActive = Color3.fromHex("9b7cdb");
+		Accent = Color3.fromHex("9b7cdb");
 		TabInactive = Color3.fromHex("888888");
 	};
 };
@@ -1427,15 +1427,21 @@ function Library:Window(Opts)
 					KBtn.MouseButton1Click:Connect(StartListen);
 					KBtn.MouseButton2Click:Connect(function()
 						if Listening then CancelListen(); return end;
-						local ModePopup = Library:CreateInstance("CanvasGroup", {
+						local PopupGui = Library:CreateInstance("ScreenGui", {
 							Parent = (gethui and gethui()) or CoreGui;
+							Name = "ModePopup";
+							ResetOnSpawn = false;
+							ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+							DisplayOrder = 99999;
+						});
+						local ModePopup = Library:CreateInstance("Frame", {
+							Parent = PopupGui;
 							Size = UDim2.fromOffset(80, 70);
 							Position = UDim2.fromOffset(KBtn.AbsolutePosition.X, KBtn.AbsolutePosition.Y + KBtn.AbsoluteSize.Y + 2);
 							BackgroundColor3 = Color3.fromHex("141414");
 							BorderSizePixel = 0;
-							ZIndex = 999;
 						});
-						Library:CreateInstance("UIStroke", { Parent = ModePopup; Color = Color3.fromHex("2a2a2a"); Thickness = 1 });
+						Library:CreateInstance("UIStroke", { Parent = ModePopup; Color = Color3.fromHex("333333"); Thickness = 1 });
 						Library:CreateInstance("UIListLayout", { Parent = ModePopup; Padding = UDim.new(0, 0); SortOrder = Enum.SortOrder.LayoutOrder });
 						Library:CreateInstance("UIPadding", { Parent = ModePopup; PaddingTop = UDim.new(0, 3); PaddingBottom = UDim.new(0, 3); PaddingLeft = UDim.new(0, 5) });
 						local modes = {"Toggle", "Hold", "Always", "None"};
@@ -1456,14 +1462,14 @@ function Library:Window(Opts)
 								end;
 								Refresh();
 								Library:NotifyKeybind();
-								ModePopup:Destroy();
+								PopupGui:Destroy();
 							end);
 						end;
 						local closeConn;
 						closeConn = UserInputService.InputBegan:Connect(function(Input)
 							if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 then
 								task.delay(0.1, function()
-									if ModePopup and ModePopup.Parent then ModePopup:Destroy() end;
+									if PopupGui and PopupGui.Parent then PopupGui:Destroy() end;
 									if closeConn then closeConn:Disconnect() end;
 								end);
 							end;
