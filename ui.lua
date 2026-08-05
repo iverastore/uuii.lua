@@ -6041,58 +6041,65 @@ function Library:BuildMediaPlayer(lp, RunService, _scriptRunning_ref)
 		pcall(function() mpTime.Text     = fmtMs(cur) .. " / " .. fmtMs(mp._durMs) end)
 	end)
 
-	-- Polling task every 10 s via allorigins proxy (bypasses CORS / Roblox domain block)
+	-- Polling task every 10 s.
+	-- Roblox cannot reach api.spotify.com directly (domain blocked + auth headers stripped by proxies).
+	-- The token field is used as a proxy URL that returns JSON in Spotify's currently-playing format.
+	-- See the setup instructions in the Settings tab for how to create a free proxy endpoint.
 	task.spawn(function()
 		while true do
 			task.wait(10)
 			pcall(function()
 				local mp = Library.MediaPlayerObj
 				if not mp or not mp.Visible then return end
-				local token = mp._token
-				if not token or token == "" then return end
-
-				-- Roblox cannot reach api.spotify.com directly.
-				-- We route through allorigins.win which forwards the request and returns JSON.
-				local encoded = Hs:UrlEncode("https://api.spotify.com/v1/me/player/currently-playing")
-				local proxyUrl = "https://api.allorigins.win/get?url=" .. encoded
+				local proxyUrl = mp._token  -- token field holds the proxy URL
+				if not proxyUrl or proxyUrl == "" then return end
 
 				local ok, resp = pcall(function()
 					return Hs:RequestAsync({
-						Url     = proxyUrl,
-						Method  = "GET",
-						Headers = { Authorization = "Bearer " .. token },
+						Url    = proxyUrl,
+						Method = "GET",
 					})
 				end)
 				if not ok or not resp or not resp.Success then return end
-
-				-- allorigins wraps the body in { "contents": "..." }
-				local ok2, wrapper = pcall(function() return Hs:JSONDecode(resp.Body) end)
-				if not ok2 or not wrapper or not wrapper.contents then return end
-
-				if wrapper.contents == "" then
+				if not resp.Body or resp.Body == "" then
 					mp:UpdateTrack("Nothing playing", "—", 0, 1, false, "")
 					return
 				end
 
-				local ok3, data = pcall(function() return Hs:JSONDecode(wrapper.contents) end)
-				if not ok3 or not data or not data.item then return end
+				local ok2, data = pcall(function() return Hs:JSONDecode(resp.Body) end)
+				if not ok2 or not data then return end
 
-				local artists = {}
-				for _, a in ipairs(data.item.artists or {}) do
-					if a.name then table.insert(artists, a.name) end
+				-- Support both raw Spotify format and simple {playing,track,artist,progress,duration,art}
+				if data.item then
+					-- raw Spotify currently-playing shape
+					local artists = {}
+					for _, a in ipairs(data.item.artists or {}) do
+						if a.name then table.insert(artists, a.name) end
+					end
+					local albumUrl = ""
+					local imgs = data.item.album and data.item.album.images
+					if imgs and imgs[1] then albumUrl = imgs[1].url or "" end
+					mp:UpdateTrack(
+						data.item.name or "Unknown",
+						table.concat(artists, ", "),
+						data.progress_ms or 0,
+						data.item.duration_ms or 1,
+						data.is_playing == true,
+						albumUrl
+					)
+				elseif data.track then
+					-- simple proxy shape
+					mp:UpdateTrack(
+						data.track  or "Nothing playing",
+						data.artist or "—",
+						data.progress  or 0,
+						data.duration  or 1,
+						data.playing   == true,
+						data.art       or ""
+					)
+				else
+					mp:UpdateTrack("Nothing playing", "—", 0, 1, false, "")
 				end
-				local albumUrl = ""
-				local imgs = data.item.album and data.item.album.images
-				if imgs and imgs[1] then albumUrl = imgs[1].url or "" end
-
-				mp:UpdateTrack(
-					data.item.name or "Unknown",
-					table.concat(artists, ", "),
-					data.progress_ms or 0,
-					data.item.duration_ms or 1,
-					data.is_playing == true,
-					albumUrl
-				)
 			end)
 		end
 	end)
