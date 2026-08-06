@@ -5537,7 +5537,9 @@ function Library:Notify(Text, Time)
 
 	task.spawn(function()
 		task.wait();
-		local Target = math.max(0, Outer.AbsoluteSize.X - 4);
+		local absSize = Outer and Outer.AbsoluteSize
+		local sizeX = typeof(absSize) == "Vector2" and absSize.X or (type(absSize) == "table" and absSize.X) or 0
+		local Target = math.max(0, sizeX - 4);
 		TweenService:Create(Accent, TweenInfo.new(Time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 			Size = UDim2.new(0, Target, 0, 1);
 		}):Play();
