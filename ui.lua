@@ -1,11 +1,7 @@
 --!nolint
 --!nocheck
 
-if not LPH_OBFUSCATED then
-    getgenv()["LPH_NO_" .. "VIRTUALIZE"] = function(f) return f end
-    getgenv()["LPH_J" .. "IT"] = function(f) return f end
-    getgenv()["LPH_J" .. "IT_MAX"] = function(f) return f end
-end
+local LPH_NO_VIRTUALIZE = LPH_NO_VIRTUALIZE or function(f) return f end
 
 local Library = LPH_NO_VIRTUALIZE(function()
 local UserInputService = game:GetService("UserInputService");
