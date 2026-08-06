@@ -1,7 +1,11 @@
 --!nolint
 --!nocheck
 
-local LPH_NO_VIRTUALIZE = LPH_NO_VIRTUALIZE or function(f) return f end
+if not LPH_OBFUSCATED then
+    getgenv()["LPH_NO_" .. "VIRTUALIZE"] = function(f) return f end
+    getgenv()["LPH_J" .. "IT"] = function(f) return f end
+    getgenv()["LPH_J" .. "IT_MAX"] = function(f) return f end
+end
 
 local Library = LPH_NO_VIRTUALIZE(function()
 local UserInputService = game:GetService("UserInputService");
@@ -11,14 +15,6 @@ local GuiService = game:GetService("GuiService");
 local RunService = game:GetService("RunService");
 local CoreGui = game:GetService("CoreGui");
 local TweenService = game:GetService("TweenService");
-
-local function safeConnect(event, callback)
-	if event and typeof(event) == "RBXScriptSignal" then
-		return event:Connect(callback);
-	elseif event and type(event) == "table" and type(event.Connect) == "function" then
-		return event:Connect(callback);
-	end;
-end;
 
 local GuiInset = GuiService:GetGuiInset().Y;
 
@@ -1839,8 +1835,8 @@ function Library:Window(Opts)
 						end;
 					end;
 					SetCpTab(1);
-					safeConnect(ColorTabBtn.MouseButton1Click, function() SetCpTab(1) end);
-					safeConnect(AnimationsTabBtn.MouseButton1Click, function() SetCpTab(2) end);
+					ColorTabBtn.MouseButton1Click:Connect(function() SetCpTab(1) end);
+					AnimationsTabBtn.MouseButton1Click:Connect(function() SetCpTab(2) end);
 
 					ColorPage = Library:CreateInstance("CanvasGroup", {
 						Name                   = "ColorPage";
@@ -3022,8 +3018,8 @@ function Library:Window(Opts)
 					end;
 				end;
 				SetCpTab(1);
-				safeConnect(ColorTabBtn.MouseButton1Click, function() SetCpTab(1) end);
-				safeConnect(AnimationsTabBtn.MouseButton1Click, function() SetCpTab(2) end);
+				ColorTabBtn.MouseButton1Click:Connect(function() SetCpTab(1) end);
+				AnimationsTabBtn.MouseButton1Click:Connect(function() SetCpTab(2) end);
 
 				ColorPage = Library:CreateInstance("CanvasGroup", {
 					Name                   = "ColorPage";
@@ -5545,9 +5541,7 @@ function Library:Notify(Text, Time)
 
 	task.spawn(function()
 		task.wait();
-		local absSize = Outer and Outer.AbsoluteSize
-		local sizeX = typeof(absSize) == "Vector2" and absSize.X or (type(absSize) == "table" and absSize.X) or 0
-		local Target = math.max(0, sizeX - 4);
+		local Target = math.max(0, Outer.AbsoluteSize.X - 4);
 		TweenService:Create(Accent, TweenInfo.new(Time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 			Size = UDim2.new(0, Target, 0, 1);
 		}):Play();
@@ -5884,20 +5878,7 @@ function Library:BuildTargetHUD(lp, Players, TweenService, RaycastParams, worksp
 	end
 end
 
-function Library:BuildMediaPlayer(lp, Players, TweenService, RunService, Hs)
-	local mpGui = Instance.new("ScreenGui")
-	mpGui.Name = "MediaPlayerGui"
-	mpGui.ResetOnSpawn = false
-	mpGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	mpGui.DisplayOrder = 49
-	pcall(function() mpGui.Parent = game:GetService("CoreGui") end)
-	if not mpGui.Parent then
-		pcall(function() mpGui.Parent = lp:WaitForChild("PlayerGui") end)
-	end
-
-	local function CI(cls, props)
-		local i = Instance.new(cls)
-		for k, v in pairs(props or {}) do i[k] = v end
+return Library;
 		return i
 	end
 
