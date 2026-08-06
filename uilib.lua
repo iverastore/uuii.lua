@@ -5874,7 +5874,20 @@ function Library:BuildTargetHUD(lp, Players, TweenService, RaycastParams, worksp
 	end
 end
 
-return Library;
+function Library:BuildMediaPlayer(lp, Players, TweenService, RunService, Hs)
+	local mpGui = Instance.new("ScreenGui")
+	mpGui.Name = "MediaPlayerGui"
+	mpGui.ResetOnSpawn = false
+	mpGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	mpGui.DisplayOrder = 49
+	pcall(function() mpGui.Parent = game:GetService("CoreGui") end)
+	if not mpGui.Parent then
+		pcall(function() mpGui.Parent = lp:WaitForChild("PlayerGui") end)
+	end
+
+	local function CI(cls, props)
+		local i = Instance.new(cls)
+		for k, v in pairs(props or {}) do i[k] = v end
 		return i
 	end
 
