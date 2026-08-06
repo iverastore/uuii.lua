@@ -1,5 +1,4 @@
---!nolint
---!nocheck
+
 
 if not LPH_OBFUSCATED then
     getgenv()["LPH_NO_" .. "VIRTUALIZE"] = function(f) return f end
@@ -35,10 +34,10 @@ local Library = {
 	AnimationSpeed = 1;
 	LogFile = "afffaaaa/Logs/Session.log";
 
-	-- Palette-driven theming registry
-	-- ThemeParts[key] = { {Inst, Prop, IsGradient?}, ... }
+	
+	
 	ThemeParts = {};
-	ThemeColors = {};  -- current value per key
+	ThemeColors = {};  
 };
 
 local Palette = {
@@ -114,7 +113,7 @@ local _AccentLastOffset = -999;
 local _AccentConn = game:GetService("RunService").Heartbeat:Connect(function(Dt)
 	AccentClock = AccentClock + Dt * 0.8;
 	local Off = (AccentClock % 2) - 1;
-	-- Only update gradients if offset actually changed visually
+	
 	local Rounded = math.floor(Off * 50 + 0.5) / 50;
 	if Rounded == _AccentLastOffset then return end;
 	_AccentLastOffset = Rounded;
@@ -596,7 +595,7 @@ function Library:Window(Opts)
 		BackgroundColor3 = Color3.fromHex("FFFFFF");
 		BorderSizePixel = 0;
 	});
-	self:CreateInstance("UIGradient", {
+	local OuterGrad = self:CreateInstance("UIGradient", {
 		Parent   = Outer;
 		Rotation = 90;
 		Color    = NewColorSequence({
@@ -604,13 +603,15 @@ function Library:Window(Opts)
 			NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 		});
 	});
-	self:CreateInstance("UIStroke", {
+	self:RegisterTheme("Background", OuterGrad, "Color", true);
+	local OuterStroke = self:CreateInstance("UIStroke", {
 		Parent          = Outer;
 		Color           = Color3.fromHex("000000");
 		Thickness       = 1;
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
 		LineJoinMode    = Enum.LineJoinMode.Miter;
 	});
+	self:RegisterTheme("Outline", OuterStroke, "Color");
 
 	local InnerOutline = self:CreateInstance("Frame", {
 		Name = "InnerOutline";
@@ -620,13 +621,14 @@ function Library:Window(Opts)
 		BackgroundTransparency = 1;
 		BorderSizePixel = 0;
 	});
-	self:CreateInstance("UIStroke", {
+	local InnerStroke = self:CreateInstance("UIStroke", {
 		Parent          = InnerOutline;
 		Color           = Color3.fromHex("2a2a2a");
 		Thickness       = 1;
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
 		LineJoinMode    = Enum.LineJoinMode.Miter;
 	});
+	self:RegisterTheme("Inline", InnerStroke, "Color");
 
 	local TopLine = self:CreateInstance("Frame", {
 		Name = "TopLine";
@@ -657,6 +659,7 @@ function Library:Window(Opts)
 		TextXAlignment         = Enum.TextXAlignment.Left;
 		TextYAlignment         = Enum.TextYAlignment.Center;
 	});
+	self:RegisterTheme("Text", Title, "TextColor3");
 	if ProggyCleanFont then Title.FontFace = ProggyCleanFont end;
 
 	local Content = self:CreateInstance("Frame", {
@@ -750,6 +753,7 @@ function Library:Window(Opts)
 				NewColorSequenceKeypoint(1, Color3.fromHex("141414"));
 			});
 		});
+		Library:RegisterTheme("Background", Gradient, "Color", true);
 
 		local function MakePiece(Name, Anchor, Pos, Sz, Color, ZIdx)
 			return Library:CreateInstance("Frame", {
@@ -798,6 +802,7 @@ function Library:Window(Opts)
 			TextXAlignment         = Enum.TextXAlignment.Center;
 			TextYAlignment         = Enum.TextYAlignment.Center;
 		});
+		Library:RegisterTheme("Unselected", Lbl, "TextColor3");
 		if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 		local TopGradient = Library:CreateInstance("Frame", {
@@ -1105,8 +1110,8 @@ function Library:Window(Opts)
 				BorderSizePixel        = 0;
 			});
 
-			local function Edge(Anchor, Pos, Sz, Color)
-				Library:CreateInstance("Frame", {
+			local function Edge(Anchor, Pos, Sz, Color, ThemeKey)
+				local f = Library:CreateInstance("Frame", {
 					Parent           = Sec;
 					AnchorPoint      = Anchor;
 					Position         = Pos;
@@ -1115,8 +1120,9 @@ function Library:Window(Opts)
 					BorderSizePixel  = 0;
 					ZIndex           = 5;
 				});
+				Library:RegisterTheme(ThemeKey, f, "BackgroundColor3")
 			end;
-			Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(1, 0, 0, 1),  "000000"); -- top black
+			Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(1, 0, 0, 1),  "000000", "Outline"); 
 			local TopLine = Library:CreateInstance("Frame", {
 				Name             = "TopLine";
 				Parent           = Sec;
@@ -1132,12 +1138,12 @@ function Library:Window(Opts)
 				Rotation = 0;
 			});
 			Library:RegisterAccentGradient(SecTopGradient);
-			Edge(Vector2.new(0, 1), UDim2.new(0, 0, 1, 0),  UDim2.new(1, 0, 0, 1),  "000000"); -- bottom black
-			Edge(Vector2.new(0, 1), UDim2.new(0, 1, 1, -1), UDim2.new(1, -2, 0, 1), "393939"); -- bottom gray
-			Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(0, 1, 1, 0),  "000000"); -- left black
-			Edge(Vector2.new(0, 0), UDim2.new(0, 1, 0, 2),  UDim2.new(0, 1, 1, -3), "393939"); -- left gray
-			Edge(Vector2.new(1, 0), UDim2.new(1, 0, 0, 0),  UDim2.new(0, 1, 1, 0),  "000000"); -- right black
-			Edge(Vector2.new(1, 0), UDim2.new(1, -1, 0, 2), UDim2.new(0, 1, 1, -3), "393939"); -- right gray
+			Edge(Vector2.new(0, 1), UDim2.new(0, 0, 1, 0),  UDim2.new(1, 0, 0, 1),  "000000", "Outline"); 
+			Edge(Vector2.new(0, 1), UDim2.new(0, 1, 1, -1), UDim2.new(1, -2, 0, 1), "393939", "Inline"); 
+			Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(0, 1, 1, 0),  "000000", "Outline"); 
+			Edge(Vector2.new(0, 0), UDim2.new(0, 1, 0, 2),  UDim2.new(0, 1, 1, -3), "393939", "Inline"); 
+			Edge(Vector2.new(1, 0), UDim2.new(1, 0, 0, 0),  UDim2.new(0, 1, 1, 0),  "000000", "Outline"); 
+			Edge(Vector2.new(1, 0), UDim2.new(1, -1, 0, 2), UDim2.new(0, 1, 1, -3), "393939", "Inline"); 
 
 			local TitleCover = Library:CreateInstance("Frame", {
 				Name             = "TitleCover";
@@ -1148,6 +1154,7 @@ function Library:Window(Opts)
 				BorderSizePixel  = 0;
 				ZIndex           = 6;
 			});
+			Library:RegisterTheme("Background", TitleCover, "BackgroundColor3");
 
 			local GradTop    = Color3.fromHex("161616");
 			local GradBottom = Color3.fromHex("1c1c1c");
@@ -1179,6 +1186,7 @@ function Library:Window(Opts)
 				TextYAlignment         = Enum.TextYAlignment.Center;
 				ZIndex                 = 7;
 			});
+			Library:RegisterTheme("Text", SecTitle, "TextColor3");
 			if ProggyCleanFont then SecTitle.FontFace = ProggyCleanFont end;
 
 			local function UpdateCover()
@@ -1248,6 +1256,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("000000");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Outline", Box, "BackgroundColor3");
 				local BoxGray = Library:CreateInstance("Frame", {
 					Name             = "Gray";
 					Parent           = Box;
@@ -1256,6 +1265,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", BoxGray, "BackgroundColor3");
 				local BoxInside = Library:CreateInstance("Frame", {
 					Name             = "Inside";
 					Parent           = BoxGray;
@@ -1264,6 +1274,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Element", BoxInside, "BackgroundColor3");
 
 				local Fill = Library:CreateInstance("Frame", {
 					Name                   = "Fill";
@@ -1291,25 +1302,30 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3");
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local TweenIn  = TweenInfo.new(0.16, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out);
 				local TweenOut = TweenInfo.new(0.14, Enum.EasingStyle.Quad,  Enum.EasingDirection.In);
 
 				local function Render()
+					local tOnColor  = Library.ThemeColors["Text"] or OnColor;
+					local tOffColor = Library.ThemeColors["Unselected"] or OffColor;
 					local Info = State and TweenIn or TweenOut;
 					Library:Tween(Fill, Info, {
 						Size                   = State and UDim2.new(1, -2, 1, -2) or UDim2.new(0, 0, 0, 0);
 						BackgroundTransparency = State and 0 or 1;
 					}):Play();
 					Library:Tween(Lbl, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						TextColor3 = State and OnColor or OffColor;
+						TextColor3 = State and tOnColor or tOffColor;
 					}):Play();
 				end;
-				-- initial state without animation
+				
+				local tOnColor  = Library.ThemeColors["Text"] or OnColor;
+				local tOffColor = Library.ThemeColors["Unselected"] or OffColor;
 				Fill.Size                   = State and UDim2.new(1, -2, 1, -2) or UDim2.new(0, 0, 0, 0);
 				Fill.BackgroundTransparency = State and 0 or 1;
-				Lbl.TextColor3              = State and OnColor or OffColor;
+				Lbl.TextColor3              = State and tOnColor or tOffColor;
 
 				local Listeners = {};
 				local function SetState(V, Fire)
@@ -2445,6 +2461,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3");
 
 				local ValLbl = Library:CreateInstance("TextLabel", {
 					Name                   = "Value";
@@ -2460,6 +2477,7 @@ function Library:Window(Opts)
 					TextYAlignment         = Enum.TextYAlignment.Center;
 					Text                   = "";
 				});
+				Library:RegisterTheme("Unselected", ValLbl, "TextColor3");
 				if ProggyCleanFont then
 					Lbl.FontFace    = ProggyCleanFont;
 					ValLbl.FontFace = ProggyCleanFont;
@@ -2476,6 +2494,7 @@ function Library:Window(Opts)
 					AutoButtonColor  = false;
 					Text             = "";
 				});
+				Library:RegisterTheme("Outline", Track, "BackgroundColor3");
 				local TrackGray = Library:CreateInstance("Frame", {
 					Parent           = Track;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -2483,6 +2502,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", TrackGray, "BackgroundColor3");
 				local TrackInside = Library:CreateInstance("Frame", {
 					Parent           = TrackGray;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -2490,6 +2510,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("1c1c1c");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Element", TrackInside, "BackgroundColor3");
 
 				local Fill = Library:CreateInstance("Frame", {
 					Name             = "Fill";
@@ -2611,6 +2632,7 @@ function Library:Window(Opts)
 						Text                   = "";
 						LayoutOrder            = #Buttons + 1;
 					});
+					Library:RegisterTheme("Outline", Btn, "BackgroundColor3")
 					local BGray = Library:CreateInstance("Frame", {
 						Parent           = Btn;
 						Position         = UDim2.new(0, 1, 0, 1);
@@ -2618,6 +2640,7 @@ function Library:Window(Opts)
 						BackgroundColor3 = Color3.fromHex("2a2a2a");
 						BorderSizePixel  = 0;
 					});
+					Library:RegisterTheme("Inline", BGray, "BackgroundColor3")
 					local BInside = Library:CreateInstance("Frame", {
 						Parent           = BGray;
 						Position         = UDim2.new(0, 1, 0, 1);
@@ -2625,7 +2648,7 @@ function Library:Window(Opts)
 						BackgroundColor3 = Color3.fromHex("FFFFFF");
 						BorderSizePixel  = 0;
 					});
-					Library:CreateInstance("UIGradient", {
+					local BtnGrad = Library:CreateInstance("UIGradient", {
 						Parent   = BInside;
 						Rotation = 90;
 						Color    = NewColorSequence({
@@ -2633,6 +2656,7 @@ function Library:Window(Opts)
 							NewColorSequenceKeypoint(1, Color3.fromHex("121212"));
 						});
 					});
+					Library:RegisterTheme("Element", BtnGrad, "Color", true)
 					local Lbl = Library:CreateInstance("TextLabel", {
 						Name                   = "Label";
 						Parent                 = BInside;
@@ -2645,6 +2669,7 @@ function Library:Window(Opts)
 						TextXAlignment         = Enum.TextXAlignment.Center;
 						TextYAlignment         = Enum.TextYAlignment.Center;
 					});
+					Library:RegisterTheme("Text", Lbl, "TextColor3")
 					if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 					local ClickIn  = TweenInfo.new(0.1,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
@@ -2748,6 +2773,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3")
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local Swatch = Library:CreateInstance("TextButton", {
@@ -2761,6 +2787,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("000105");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Outline", Swatch, "BackgroundColor3")
 				local SwatchInline = Library:CreateInstance("Frame", {
 					Name             = "Inline";
 					Parent           = Swatch;
@@ -2769,6 +2796,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("252527");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", SwatchInline, "BackgroundColor3")
 				local SwatchHandle = Library:CreateInstance("Frame", {
 					Name             = "Handle";
 					Parent           = SwatchInline;
@@ -3726,6 +3754,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3")
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local Box = Library:CreateInstance("TextButton", {
@@ -3739,6 +3768,7 @@ function Library:Window(Opts)
 					AutoButtonColor  = false;
 					Text             = "";
 				});
+				Library:RegisterTheme("Outline", Box, "BackgroundColor3")
 				local BoxGray = Library:CreateInstance("Frame", {
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -3746,6 +3776,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", BoxGray, "BackgroundColor3")
 				local BoxInside = Library:CreateInstance("Frame", {
 					Parent           = BoxGray;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -3753,7 +3784,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("FFFFFF");
 					BorderSizePixel  = 0;
 				});
-				Library:CreateInstance("UIGradient", {
+				local DropdownGrad = Library:CreateInstance("UIGradient", {
 					Parent   = BoxInside;
 					Rotation = 90;
 					Color    = NewColorSequence({
@@ -3761,6 +3792,7 @@ function Library:Window(Opts)
 						NewColorSequenceKeypoint(1, Color3.fromHex("121212"));
 					});
 				});
+				Library:RegisterTheme("Element", DropdownGrad, "Color", true)
 
 				local ValLbl = Library:CreateInstance("TextLabel", {
 					Name                   = "Value";
@@ -3776,6 +3808,7 @@ function Library:Window(Opts)
 					TextTruncate           = Enum.TextTruncate.AtEnd;
 					ClipsDescendants       = true;
 				});
+				Library:RegisterTheme("Text", ValLbl, "TextColor3")
 				local Arrow = Library:CreateInstance("Frame", {
 					Name                   = "Arrow";
 					Parent                 = BoxInside;
@@ -3880,7 +3913,7 @@ function Library:Window(Opts)
 				local OptColorInfo = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 				local function RefreshColors()
 					for _, B in OptionButtons do
-						local Target = IsSelected(B.Text) and Library.Accent or Color3.fromHex("FFFFFF");
+						local Target = IsSelected(B.Text) and Library.Accent or (Library.ThemeColors["Text"] or Color3.fromHex("FFFFFF"));
 						Library:Tween(B, OptColorInfo, { TextColor3 = Target }):Play();
 					end;
 				end;
@@ -3920,6 +3953,8 @@ function Library:Window(Opts)
 							LayoutOrder            = I;
 							ZIndex                 = 51;
 						});
+						Library:RegisterTheme("Element", Btn, "BackgroundColor3")
+						Library:RegisterTheme("Text", Btn, "TextColor3")
 						Library:CreateInstance("UIPadding", {
 							Parent      = Btn;
 							PaddingLeft = UDim.new(0, 5);
@@ -4069,6 +4104,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3")
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local Box = Library:CreateInstance("Frame", {
@@ -4080,6 +4116,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("000000");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Outline", Box, "BackgroundColor3")
 				local BoxGray = Library:CreateInstance("Frame", {
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -4087,6 +4124,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", BoxGray, "BackgroundColor3")
 				local BoxInside = Library:CreateInstance("Frame", {
 					Parent           = BoxGray;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -4094,7 +4132,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("FFFFFF");
 					BorderSizePixel  = 0;
 				});
-				Library:CreateInstance("UIGradient", {
+				local TextboxGrad = Library:CreateInstance("UIGradient", {
 					Parent   = BoxInside;
 					Rotation = 90;
 					Color    = NewColorSequence({
@@ -4102,6 +4140,7 @@ function Library:Window(Opts)
 						NewColorSequenceKeypoint(1, Color3.fromHex("121212"));
 					});
 				});
+				Library:RegisterTheme("Element", TextboxGrad, "Color", true)
 
 				local Input = Library:CreateInstance("TextBox", {
 					Name                   = "Input";
@@ -4190,6 +4229,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Left;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3")
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local Box = Library:CreateInstance("Frame", {
@@ -4201,6 +4241,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("000000");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Outline", Box, "BackgroundColor3")
 				local BoxGray = Library:CreateInstance("Frame", {
 					Parent           = Box;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -4208,6 +4249,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("2a2a2a");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Inline", BoxGray, "BackgroundColor3")
 				local BoxInside = Library:CreateInstance("Frame", {
 					Parent           = BoxGray;
 					Position         = UDim2.new(0, 1, 0, 1);
@@ -4215,7 +4257,7 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("FFFFFF");
 					BorderSizePixel  = 0;
 				});
-				Library:CreateInstance("UIGradient", {
+				local KeybindGrad = Library:CreateInstance("UIGradient", {
 					Parent   = BoxInside;
 					Rotation = 90;
 					Color    = NewColorSequence({
@@ -4223,6 +4265,7 @@ function Library:Window(Opts)
 						NewColorSequenceKeypoint(1, Color3.fromHex("121212"));
 					});
 				});
+				Library:RegisterTheme("Element", KeybindGrad, "Color", true)
 
 				local Display = Library:CreateInstance("TextLabel", {
 					Name                   = "Display";
@@ -4235,6 +4278,7 @@ function Library:Window(Opts)
 					TextXAlignment         = Enum.TextXAlignment.Center;
 					TextYAlignment         = Enum.TextYAlignment.Center;
 				});
+				Library:RegisterTheme("Text", Display, "TextColor3")
 				if ProggyCleanFont then Display.FontFace = ProggyCleanFont end;
 
 				local Listening = false;
@@ -4551,6 +4595,7 @@ function Library:Window(Opts)
 					TextSize               = 12;
 					TextXAlignment         = Enum.TextXAlignment.Left;
 				});
+				Library:RegisterTheme("Text", Lbl, "TextColor3")
 				if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
 
 				local Box = Library:CreateInstance("Frame", {
@@ -4562,21 +4607,24 @@ function Library:Window(Opts)
 					BackgroundColor3 = Color3.fromHex("000000");
 					BorderSizePixel  = 0;
 				});
+				Library:RegisterTheme("Outline", Box, "BackgroundColor3")
 				local BoxGray = Library:CreateInstance("Frame", {
 					Parent = Box; Position = UDim2.new(0, 1, 0, 1);
 					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("2a2a2a"); BorderSizePixel = 0;
 				});
+				Library:RegisterTheme("Inline", BoxGray, "BackgroundColor3")
 				local BoxInside = Library:CreateInstance("Frame", {
 					Parent = BoxGray; Position = UDim2.new(0, 1, 0, 1);
 					Size = UDim2.new(1, -2, 1, -2); BackgroundColor3 = Color3.fromHex("FFFFFF"); BorderSizePixel = 0;
 				});
-				Library:CreateInstance("UIGradient", {
+				local ListGrad = Library:CreateInstance("UIGradient", {
 					Parent = BoxInside; Rotation = 90;
 					Color = NewColorSequence({
 						NewColorSequenceKeypoint(0, Color3.fromHex("1B1B1B"));
 						NewColorSequenceKeypoint(1, Color3.fromHex("121212"));
 					});
 				});
+				Library:RegisterTheme("Element", ListGrad, "Color", true)
 
 				local Scroller = Library:CreateInstance("ScrollingFrame", {
 					Parent                 = BoxInside;
@@ -4610,7 +4658,7 @@ function Library:Window(Opts)
 				local OptColorInfo = TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 				local function RefreshColors()
 					for _, B in OptionButtons do
-						local Target = IsSelected(B.Text) and Library.Accent or Color3.fromHex("FFFFFF");
+						local Target = IsSelected(B.Text) and Library.Accent or (Library.ThemeColors["Text"] or Color3.fromHex("FFFFFF"));
 						Library:Tween(B, OptColorInfo, { TextColor3 = Target }):Play();
 					end;
 				end;
@@ -4645,6 +4693,7 @@ function Library:Window(Opts)
 							TextXAlignment         = Enum.TextXAlignment.Left;
 							LayoutOrder            = I;
 						});
+						Library:RegisterTheme("Text", Btn, "TextColor3")
 						Library:CreateInstance("UIPadding", { Parent = Btn; PaddingLeft = UDim.new(0, 5) });
 						if ProggyCleanFont then Btn.FontFace = ProggyCleanFont end;
 						Btn.MouseButton1Click:Connect(function() SetVal(Btn.Text) end);
@@ -5134,7 +5183,7 @@ function Library:KeybindList(Opts)
 			ZIndex           = 5;
 		});
 	end;
-	Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(1, 0, 0, 1),  "000000"); -- top black
+	Edge(Vector2.new(0, 0), UDim2.new(0, 0, 0, 0),  UDim2.new(1, 0, 0, 1),  "000000"); 
 	local TopLine = self:CreateInstance("Frame", {
 		Name             = "TopLine";
 		Parent           = Frame;
@@ -5541,7 +5590,9 @@ function Library:Notify(Text, Time)
 
 	task.spawn(function()
 		task.wait();
-		local Target = math.max(0, Outer.AbsoluteSize.X - 4);
+		local absSize = Outer.AbsoluteSize;
+		local targetX = (typeof(absSize) == "Vector2" and absSize.X) or (type(absSize) == "table" and absSize.X) or 0;
+		local Target = math.max(0, targetX - 4);
 		TweenService:Create(Accent, TweenInfo.new(Time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 			Size = UDim2.new(0, Target, 0, 1);
 		}):Play();
@@ -5604,21 +5655,11 @@ function Library:Unload()
 	getgenv().Library = nil;
 end;
 
--- ============================================================
--- Palette / theme registry
--- ============================================================
-
--- Register an instance so ChangeTheme can recolor it.
--- key     : string matching the keys aeri.lua passes to ChangeTheme
---           e.g. "Background", "Element", "Outline", "Inline", etc.
--- inst    : Roblox Instance
--- prop    : property name (default "BackgroundColor3")
--- isGrad  : if true, inst is a UIGradient and we set .Color
 function Library:RegisterTheme(key, inst, prop, isGrad)
 	if not inst then return end
 	self.ThemeParts[key] = self.ThemeParts[key] or {}
 	table.insert(self.ThemeParts[key], { Inst = inst, Prop = prop or "BackgroundColor3", IsGrad = isGrad })
-	-- Apply current value if we already have one
+	
 	local cur = self.ThemeColors[key]
 	if cur then
 		pcall(function()
@@ -5631,14 +5672,12 @@ function Library:RegisterTheme(key, inst, prop, isGrad)
 	end
 end
 
--- Called by aeri.lua colorpicker callbacks and preset loaders.
--- key may be a string or a table of strings (any matching key is applied).
 function Library:ChangeTheme(key, color)
 	if not color or typeof(color) ~= "Color3" then return end
 	local keys = type(key) == "table" and key or { key }
 	for _, k in ipairs(keys) do
 		local kl = tostring(k):lower()
-		-- Accent handled by SetAccent
+		
 		if kl == "accent" then
 			self:SetAccent(color)
 		else
@@ -5662,435 +5701,6 @@ function Library:ChangeTheme(key, color)
 			end
 		end
 	end
-end
-
--- ============================================================
--- Target HUD  (draggable overlay)
--- ============================================================
-function Library:BuildTargetHUD(lp, Players, TweenService, RaycastParams, workspace)
-	local CoreGuiSvc = game:GetService("CoreGui")
-	local thuGui = Instance.new("ScreenGui")
-	thuGui.Name = "TargetHUDGui"
-	thuGui.ResetOnSpawn = false
-	thuGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	thuGui.DisplayOrder = 50
-	pcall(function() thuGui.Parent = CoreGuiSvc end)
-	if not thuGui.Parent then
-		pcall(function() thuGui.Parent = lp:WaitForChild("PlayerGui") end)
-	end
-
-	local function CI(cls, props)
-		local i = Instance.new(cls)
-		for k, v in pairs(props or {}) do i[k] = v end
-		return i
-	end
-
-	local thuOuter = CI("Frame", {
-		Name="THUDOuter", Size=UDim2.new(0,216,0,80),
-		Position=UDim2.new(1,-232,0.5,-40),
-		BackgroundColor3=Color3.fromHex("000000"),
-		BorderSizePixel=0, Visible=false, ClipsDescendants=false,
-		Parent=thuGui,
-	})
-	local thuMid = CI("Frame", {
-		Size=UDim2.new(1,-2,1,-2), Position=UDim2.new(0,1,0,1),
-		BackgroundColor3=Color3.fromHex("333333"), BorderSizePixel=0, Parent=thuOuter,
-	})
-	local thuInner = CI("Frame", {
-		Name="Inner", Size=UDim2.new(1,-2,1,-2), Position=UDim2.new(0,1,0,1),
-		BackgroundColor3=Color3.fromHex("1a1a1a"), BorderSizePixel=0,
-		ClipsDescendants=true, Parent=thuMid,
-	})
-	CI("UIGradient", {
-		Color=NewColorSequence({ NewColorSequenceKeypoint(0,Color3.fromHex("1e1e1e")); NewColorSequenceKeypoint(1,Color3.fromHex("141414")) }),
-		Rotation=90, Parent=thuInner,
-	})
-	-- Register inner bg for "Background" theme key
-	self:RegisterTheme("Background", thuInner, "BackgroundColor3")
-	self:RegisterTheme("Background", thuMid,   "BackgroundColor3")
-
-	local thuAccentLine = CI("Frame", {
-		Name="AccentLine", Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,0),
-		BackgroundColor3=self.Accent, BorderSizePixel=0, ZIndex=3, Parent=thuInner,
-	})
-	local thuAccentGrad = Instance.new("UIGradient")
-	self:RegisterAccentGradient(thuAccentGrad)
-	thuAccentGrad.Parent = thuAccentLine
-
-	local thuHeader = CI("TextLabel", {
-		Size=UDim2.new(1,-6,0,12), Position=UDim2.new(0,3,0,2),
-		BackgroundTransparency=1, Text="TARGET HUD",
-		TextColor3=self.Accent, TextSize=9, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Right, ZIndex=4, Parent=thuInner,
-	})
-	self:RegisterAccent(thuHeader, "TextColor3")
-
-	local thuAvatar = CI("ImageLabel", {
-		Name="Avatar", Size=UDim2.new(0,46,0,46), Position=UDim2.new(0,5,0,14),
-		BackgroundColor3=Color3.fromHex("232323"), BorderSizePixel=0,
-		ScaleType=Enum.ScaleType.Fit, Image="", Parent=thuInner,
-	})
-	CI("UIStroke", { Color=Color3.fromHex("333333"), Thickness=1,
-		ApplyStrokeMode=Enum.ApplyStrokeMode.Border, Parent=thuAvatar })
-
-	local thuName = CI("TextLabel", {
-		Name="TargetName", Size=UDim2.new(1,-62,0,14), Position=UDim2.new(0,56,0,9),
-		BackgroundTransparency=1, Text="—", TextColor3=Color3.fromHex("e0e0e0"),
-		TextSize=13, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, TextTruncate=Enum.TextTruncate.AtEnd,
-		Parent=thuInner,
-	})
-	self:RegisterTheme("Text", thuName, "TextColor3")
-
-	local thuHPBG = CI("Frame", {
-		Name="HPBarBG", Size=UDim2.new(1,-62,0,5), Position=UDim2.new(0,56,0,28),
-		BackgroundColor3=Color3.fromHex("2a2a2a"), BorderSizePixel=0,
-		ClipsDescendants=true, Parent=thuInner,
-	})
-	CI("UICorner", { CornerRadius=UDim.new(0,2), Parent=thuHPBG })
-	self:RegisterTheme("Element", thuHPBG, "BackgroundColor3")
-
-	local thuHPFill = CI("Frame", {
-		Name="HPFill", Size=UDim2.new(1,0,1,0),
-		BackgroundColor3=Color3.fromRGB(72,199,90), BorderSizePixel=0, Parent=thuHPBG,
-	})
-	CI("UICorner", { CornerRadius=UDim.new(0,2), Parent=thuHPFill })
-
-	local thuHPText = CI("TextLabel", {
-		Name="HPText", Size=UDim2.new(1,-62,0,11), Position=UDim2.new(0,56,0,35),
-		BackgroundTransparency=1, Text="HP: 100 / 100",
-		TextColor3=Color3.fromHex("888888"), TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, Parent=thuInner,
-	})
-	self:RegisterTheme("Unselected", thuHPText, "TextColor3")
-
-	local thuDist = CI("TextLabel", {
-		Name="Distance", Size=UDim2.new(0,90,0,11), Position=UDim2.new(0,56,0,49),
-		BackgroundTransparency=1, Text="Dist: —",
-		TextColor3=Color3.fromHex("888888"), TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, Parent=thuInner,
-	})
-	self:RegisterTheme("Unselected", thuDist, "TextColor3")
-
-	local thuLOS = CI("TextLabel", {
-		Name="LOS", Size=UDim2.new(0,56,0,11), Position=UDim2.new(1,-60,0,49),
-		BackgroundTransparency=1, Text="LOS: —",
-		TextColor3=Color3.fromHex("888888"), TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Right, Parent=thuInner,
-	})
-	self:RegisterTheme("Unselected", thuLOS, "TextColor3")
-
-	self:Draggable(thuOuter)
-
-	local thuAvatarCache = {}
-
-	self.TargetHUDObj = {
-		Visible = false,
-		Items   = { Container = thuOuter },
-		_cur    = nil,
-	}
-
-	self.TargetHUDObj.SetVisibility = function(self2, v)
-		self2.Visible = v
-		if not v then thuOuter.Visible = false end
-	end
-
-	self.TargetHUDObj.SetTarget = function(self2, target)
-		if not self2.Visible then return end
-		self2._cur = target
-		local char, displayName, userId
-		pcall(function()
-			if typeof(target) == "Instance" and target:IsA("Player") then
-				char        = target.Character
-				displayName = target.DisplayName ~= "" and target.DisplayName or target.Name
-				userId      = target.UserId
-				if Library.Flags and Library.Flags["TargetHUDAvatar"] ~= false then
-					if thuAvatarCache[userId] then
-						thuAvatar.Image = thuAvatarCache[userId]
-					else
-						task.spawn(function()
-							local ok, url = pcall(function()
-								return Players:GetUserThumbnailAsync(userId,
-									Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
-							end)
-							if ok and url then
-								thuAvatarCache[userId] = url
-								pcall(function() thuAvatar.Image = url end)
-							end
-						end)
-					end
-				else
-					thuAvatar.Image = ""
-				end
-			elseif typeof(target) == "Instance" and target:IsA("Model") then
-				char        = target
-				displayName = target.Name
-				thuAvatar.Image = ""
-			end
-		end)
-		if not char or not char.Parent then thuOuter.Visible = false; return end
-		local hum  = char:FindFirstChildOfClass("Humanoid")
-		local root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChildOfClass("BasePart")
-		local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-		pcall(function() thuName.Text = displayName or "?" end)
-		pcall(function()
-			if hum then
-				local hp    = math.max(0, math.floor(hum.Health))
-				local maxhp = math.max(1, math.floor(hum.MaxHealth))
-				local ratio = math.clamp(hp / maxhp, 0, 1)
-				TweenService:Create(thuHPFill, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-					{ Size = UDim2.new(ratio, 0, 1, 0) }):Play()
-				thuHPText.Text = "HP: " .. hp .. " / " .. maxhp
-				if ratio > 0.6 then
-					thuHPFill.BackgroundColor3 = Color3.fromRGB(72, 199, 90)
-				elseif ratio > 0.3 then
-					thuHPFill.BackgroundColor3 = Color3.fromRGB(224, 178, 56)
-				else
-					thuHPFill.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
-				end
-			end
-		end)
-		pcall(function()
-			if root and myRoot then
-				thuDist.Text = "Dist: " .. math.floor((root.Position - myRoot.Position).Magnitude) .. "m"
-			end
-		end)
-		pcall(function()
-			if root and myRoot then
-				local origin = myRoot.Position + Vector3.new(0, 1.5, 0)
-				local dir    = root.Position - origin
-				local params = RaycastParams.new()
-				params.FilterDescendantsInstances = { lp.Character, char }
-				params.FilterType = Enum.RaycastFilterType.Exclude
-				local hit = workspace:Raycast(origin, dir, params)
-				if not hit then
-					thuLOS.Text = "LOS: ✓"; thuLOS.TextColor3 = Color3.fromRGB(72, 199, 90)
-				else
-					thuLOS.Text = "LOS: ✗"; thuLOS.TextColor3 = Color3.fromRGB(220, 60, 60)
-				end
-			end
-		end)
-		thuOuter.Visible = true
-	end
-
-	self.TargetHUDObj.Update = function(self2)
-		if self2._cur then pcall(function() self2:SetTarget(self2._cur) end) end
-	end
-end
-
-return Library;
-		return i
-	end
-
-	local mpOuter = CI("Frame", {
-		Name="MPOuter", Size=UDim2.new(0,240,0,70),
-		Position=UDim2.new(0,16,1,-86),
-		BackgroundColor3=Color3.fromHex("000000"),
-		BorderSizePixel=0, Visible=false, Parent=mpGui,
-	})
-	local mpMid = CI("Frame", {
-		Size=UDim2.new(1,-2,1,-2), Position=UDim2.new(0,1,0,1),
-		BackgroundColor3=Color3.fromHex("333333"), BorderSizePixel=0, Parent=mpOuter,
-	})
-	local mpInner = CI("Frame", {
-		Name="Inner", Size=UDim2.new(1,-2,1,-2), Position=UDim2.new(0,1,0,1),
-		BackgroundColor3=Color3.fromHex("1a1a1a"), BorderSizePixel=0,
-		ClipsDescendants=true, Parent=mpMid,
-	})
-	CI("UIGradient", {
-		Color=NewColorSequence({ NewColorSequenceKeypoint(0,Color3.fromHex("1e1e1e")); NewColorSequenceKeypoint(1,Color3.fromHex("141414")) }),
-		Rotation=90, Parent=mpInner,
-	})
-	self:RegisterTheme("Background", mpInner, "BackgroundColor3")
-	self:RegisterTheme("Background", mpMid,   "BackgroundColor3")
-
-	local mpAccentLine = CI("Frame", {
-		Name="AccentLine", Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,0),
-		BackgroundColor3=self.Accent, BorderSizePixel=0, ZIndex=3, Parent=mpInner,
-	})
-	local mpAccentGrad = Instance.new("UIGradient")
-	self:RegisterAccentGradient(mpAccentGrad)
-	mpAccentGrad.Parent = mpAccentLine
-
-	local mpHeader = CI("TextLabel", {
-		Size=UDim2.new(1,-6,0,12), Position=UDim2.new(0,3,0,1),
-		BackgroundTransparency=1, Text="MEDIA PLAYER",
-		TextColor3=self.Accent, TextSize=9, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Right, ZIndex=4, Parent=mpInner,
-	})
-	self:RegisterAccent(mpHeader, "TextColor3")
-
-	local mpAlbum = CI("ImageLabel", {
-		Name="AlbumArt", Size=UDim2.new(0,44,0,44), Position=UDim2.new(0,5,0,13),
-		BackgroundColor3=Color3.fromHex("232323"), BorderSizePixel=0,
-		ScaleType=Enum.ScaleType.Fit, Image="", Parent=mpInner,
-	})
-	CI("UIStroke", { Color=Color3.fromHex("333333"), Thickness=1,
-		ApplyStrokeMode=Enum.ApplyStrokeMode.Border, Parent=mpAlbum })
-
-	local mpTrack = CI("TextLabel", {
-		Name="TrackName", Size=UDim2.new(1,-60,0,14), Position=UDim2.new(0,54,0,9),
-		BackgroundTransparency=1, Text="Nothing playing",
-		TextColor3=Color3.fromHex("e0e0e0"), TextSize=13, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, TextTruncate=Enum.TextTruncate.AtEnd,
-		Parent=mpInner,
-	})
-	self:RegisterTheme("Text", mpTrack, "TextColor3")
-
-	local mpArtist = CI("TextLabel", {
-		Name="ArtistName", Size=UDim2.new(1,-60,0,12), Position=UDim2.new(0,54,0,25),
-		BackgroundTransparency=1, Text="—",
-		TextColor3=Color3.fromHex("888888"), TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, TextTruncate=Enum.TextTruncate.AtEnd,
-		Parent=mpInner,
-	})
-	self:RegisterTheme("Unselected", mpArtist, "TextColor3")
-
-	local mpProgBG = CI("Frame", {
-		Name="ProgBG", Size=UDim2.new(1,-60,0,4), Position=UDim2.new(0,54,0,43),
-		BackgroundColor3=Color3.fromHex("2a2a2a"), BorderSizePixel=0,
-		ClipsDescendants=true, Parent=mpInner,
-	})
-	CI("UICorner", { CornerRadius=UDim.new(0,2), Parent=mpProgBG })
-	self:RegisterTheme("Element", mpProgBG, "BackgroundColor3")
-
-	local mpProgFill = CI("Frame", {
-		Name="ProgFill", Size=UDim2.new(0,0,1,0),
-		BackgroundColor3=self.Accent, BorderSizePixel=0, Parent=mpProgBG,
-	})
-	self:RegisterAccent(mpProgFill)
-	CI("UICorner", { CornerRadius=UDim.new(0,2), Parent=mpProgFill })
-
-	local mpTime = CI("TextLabel", {
-		Name="TimeLabel", Size=UDim2.new(1,-80,0,11), Position=UDim2.new(0,54,0,50),
-		BackgroundTransparency=1, Text="—:— / —:—",
-		TextColor3=Color3.fromHex("888888"), TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Left, Parent=mpInner,
-	})
-	self:RegisterTheme("Unselected", mpTime, "TextColor3")
-
-	local mpStatus = CI("TextLabel", {
-		Name="PlayStatus", Size=UDim2.new(0,18,0,11), Position=UDim2.new(1,-22,0,50),
-		BackgroundTransparency=1, Text="▶",
-		TextColor3=self.Accent, TextSize=11, Font=Enum.Font.Code,
-		TextXAlignment=Enum.TextXAlignment.Right, Parent=mpInner,
-	})
-	self:RegisterAccent(mpStatus, "TextColor3")
-
-	self:Draggable(mpOuter)
-
-	local function fmtMs(ms)
-		local s = math.floor((ms or 0) / 1000)
-		return string.format("%d:%02d", math.floor(s / 60), s % 60)
-	end
-
-	self.MediaPlayerObj = {
-		Visible     = false,
-		_token      = "",
-		_progMs     = 0,
-		_durMs      = 1,
-		_playing    = false,
-		_tickOffset = 0,
-	}
-
-	self.MediaPlayerObj.SetVisibility = function(self2, v)
-		self2.Visible = v
-		mpOuter.Visible = v
-	end
-
-	self.MediaPlayerObj.SetToken = function(self2, t)
-		self2._token = t or ""
-	end
-
-	self.MediaPlayerObj.UpdateTrack = function(self2, track, artist, progMs, durMs, playing, albumUrl)
-		pcall(function()
-			mpTrack.Text     = (track ~= "" and track)   or "Nothing playing"
-			mpArtist.Text    = (artist ~= "" and artist) or "—"
-			self2._progMs    = progMs or 0
-			self2._durMs     = math.max(1, durMs or 1)
-			self2._playing   = playing == true
-			self2._tickOffset = 0
-			mpStatus.Text    = playing and "⏸" or "▶"
-			mpAlbum.Image    = (albumUrl and albumUrl ~= "") and albumUrl or ""
-			local ratio = math.clamp(self2._progMs / self2._durMs, 0, 1)
-			mpProgFill.Size  = UDim2.new(ratio, 0, 1, 0)
-			mpTime.Text      = fmtMs(self2._progMs) .. " / " .. fmtMs(self2._durMs)
-		end)
-	end
-
-	-- Smooth progress bar between API polls
-	RunService.RenderStepped:Connect(function(dt)
-		local mp = Library.MediaPlayerObj
-		if not mp or not mp.Visible or not mp._playing then return end
-		mp._tickOffset = mp._tickOffset + dt * 1000
-		local cur   = math.min(mp._progMs + mp._tickOffset, mp._durMs)
-		local ratio = math.clamp(cur / mp._durMs, 0, 1)
-		pcall(function() mpProgFill.Size = UDim2.new(ratio, 0, 1, 0) end)
-		pcall(function() mpTime.Text     = fmtMs(cur) .. " / " .. fmtMs(mp._durMs) end)
-	end)
-
-	-- Polling task every 10 s.
-	-- Roblox cannot reach api.spotify.com directly (domain blocked + auth headers stripped by proxies).
-	-- The token field is used as a proxy URL that returns JSON in Spotify's currently-playing format.
-	-- See the setup instructions in the Settings tab for how to create a free proxy endpoint.
-	task.spawn(function()
-		while true do
-			task.wait(10)
-			pcall(function()
-				local mp = Library.MediaPlayerObj
-				if not mp or not mp.Visible then return end
-				local proxyUrl = mp._token  -- token field holds the proxy URL
-				if not proxyUrl or proxyUrl == "" then return end
-
-				local ok, resp = pcall(function()
-					return Hs:RequestAsync({
-						Url    = proxyUrl,
-						Method = "GET",
-					})
-				end)
-				if not ok or not resp or not resp.Success then return end
-				if not resp.Body or resp.Body == "" then
-					mp:UpdateTrack("Nothing playing", "—", 0, 1, false, "")
-					return
-				end
-
-				local ok2, data = pcall(function() return Hs:JSONDecode(resp.Body) end)
-				if not ok2 or not data then return end
-
-				-- Support both raw Spotify format and simple {playing,track,artist,progress,duration,art}
-				if data.item then
-					-- raw Spotify currently-playing shape
-					local artists = {}
-					for _, a in ipairs(data.item.artists or {}) do
-						if a.name then table.insert(artists, a.name) end
-					end
-					local albumUrl = ""
-					local imgs = data.item.album and data.item.album.images
-					if imgs and imgs[1] then albumUrl = imgs[1].url or "" end
-					mp:UpdateTrack(
-						data.item.name or "Unknown",
-						table.concat(artists, ", "),
-						data.progress_ms or 0,
-						data.item.duration_ms or 1,
-						data.is_playing == true,
-						albumUrl
-					)
-				elseif data.track then
-					-- simple proxy shape
-					mp:UpdateTrack(
-						data.track  or "Nothing playing",
-						data.artist or "—",
-						data.progress  or 0,
-						data.duration  or 1,
-						data.playing   == true,
-						data.art       or ""
-					)
-				else
-					mp:UpdateTrack("Nothing playing", "—", 0, 1, false, "")
-				end
-			end)
-		end
-	end)
 end
 
 return Library;
