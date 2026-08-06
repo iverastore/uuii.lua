@@ -1,6 +1,13 @@
 --!nolint
 --!nocheck
 
+if not LPH_OBFUSCATED then
+    getgenv()["LPH_NO_" .. "VIRTUALIZE"] = function(f) return f end
+    getgenv()["LPH_J" .. "IT"] = function(f) return f end
+    getgenv()["LPH_J" .. "IT_MAX"] = function(f) return f end
+end
+
+local Library = LPH_NO_VIRTUALIZE(function()
 local UserInputService = game:GetService("UserInputService");
 local Workspace = game:GetService("Workspace");
 local HttpService = game:GetService("HttpService");
@@ -5871,26 +5878,7 @@ function Library:BuildTargetHUD(lp, Players, TweenService, RaycastParams, worksp
 	end
 end
 
--- ============================================================
--- Media Player  (draggable Spotify overlay)
--- ============================================================
-function Library:BuildMediaPlayer(lp, RunService, _scriptRunning_ref)
-	local Hs = game:GetService("HttpService")
-	local CoreGuiSvc = game:GetService("CoreGui")
-
-	local mpGui = Instance.new("ScreenGui")
-	mpGui.Name = "MediaPlayerGui"
-	mpGui.ResetOnSpawn = false
-	mpGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	mpGui.DisplayOrder = 49
-	pcall(function() mpGui.Parent = CoreGuiSvc end)
-	if not mpGui.Parent then
-		pcall(function() mpGui.Parent = lp:WaitForChild("PlayerGui") end)
-	end
-
-	local function CI(cls, props)
-		local i = Instance.new(cls)
-		for k, v in pairs(props or {}) do i[k] = v end
+return Library;
 		return i
 	end
 
@@ -6104,5 +6092,8 @@ function Library:BuildMediaPlayer(lp, RunService, _scriptRunning_ref)
 		end
 	end)
 end
+
+return Library;
+end)()
 
 return Library;
