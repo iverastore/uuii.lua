@@ -12,6 +12,14 @@ local RunService = game:GetService("RunService");
 local CoreGui = game:GetService("CoreGui");
 local TweenService = game:GetService("TweenService");
 
+local function safeConnect(event, callback)
+	if event and typeof(event) == "RBXScriptSignal" then
+		return event:Connect(callback);
+	elseif event and type(event) == "table" and type(event.Connect) == "function" then
+		return event:Connect(callback);
+	end;
+end;
+
 local GuiInset = GuiService:GetGuiInset().Y;
 
 local NewColorSequence = ColorSequence.new;
@@ -1831,8 +1839,8 @@ function Library:Window(Opts)
 						end;
 					end;
 					SetCpTab(1);
-					ColorTabBtn.MouseButton1Click:Connect(function() SetCpTab(1) end);
-					AnimationsTabBtn.MouseButton1Click:Connect(function() SetCpTab(2) end);
+					safeConnect(ColorTabBtn.MouseButton1Click, function() SetCpTab(1) end);
+					safeConnect(AnimationsTabBtn.MouseButton1Click, function() SetCpTab(2) end);
 
 					ColorPage = Library:CreateInstance("CanvasGroup", {
 						Name                   = "ColorPage";
@@ -3014,8 +3022,8 @@ function Library:Window(Opts)
 					end;
 				end;
 				SetCpTab(1);
-				ColorTabBtn.MouseButton1Click:Connect(function() SetCpTab(1) end);
-				AnimationsTabBtn.MouseButton1Click:Connect(function() SetCpTab(2) end);
+				safeConnect(ColorTabBtn.MouseButton1Click, function() SetCpTab(1) end);
+				safeConnect(AnimationsTabBtn.MouseButton1Click, function() SetCpTab(2) end);
 
 				ColorPage = Library:CreateInstance("CanvasGroup", {
 					Name                   = "ColorPage";
