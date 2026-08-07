@@ -2319,6 +2319,11 @@ local Library; do
 				end
 			end)
 
+			function Window:SetVisible(Bool)
+				Window.IsOpen = Bool;
+				MainFrame.Object.Visible = Bool;
+			end;
+
 			Library.SetFlags["MainFramePosition"] = function(X, Y)
 				MainFrame.Object.Position = U2New(0, X, 0, Y);
 			end;
