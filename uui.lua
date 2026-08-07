@@ -166,7 +166,7 @@ local Library; do
 			["Background"] = FromRGB(10, 10, 10);
 			["Inline"] = FromRGB(18, 18, 18);
 			["Border"] = FromRGB(30, 30, 30);
-			["Accent"] = FromRGB(255, 255, 255);
+			["Accent"] = FromRGB(0, 0, 0);
 			["Text"] = FromRGB(240, 240, 240);
 			["Element"] = FromRGB(26, 26, 26);
 			["Text Border"] = FromRGB(0, 0, 0);
