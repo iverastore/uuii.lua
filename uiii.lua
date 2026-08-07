@@ -3,8 +3,8 @@
 -- Expect a lot of bugs and issues.
 
 --[[
-	Utopiahack
-	Made by samet
+	alternate
+	Made by alternate
 	demo in demo.lua
 
 	documentation:
@@ -173,7 +173,7 @@ local Library; do
 		};
 
 		Files = {
-			Directory =  "utopiahack";
+			Directory =  "alternate";
 			Configs = "Configs";
 			Fonts = "Fonts";
 		};
@@ -573,11 +573,11 @@ local Library; do
 				makefolder(Library.Files.Directory);
 			end;
 
-			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Configs) then 
+			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Configs) then
 				makefolder(Library.Files.Directory .. "/" .. Library.Files.Configs);
 			end;
 
-			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Fonts) then 
+			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Fonts) then
 				makefolder(Library.Files.Directory .. "/" .. Library.Files.Fonts);
 			end;
 		end;
@@ -592,14 +592,14 @@ local Library; do
 		end;
 
 		function Library:GetConfigsDirectory()
-			if not isfolder(Library.Files.Configs) then 
+			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Configs) then
 				Library:DoFolders() end;
 
 			return Library.Files.Directory .. "/" .. Library.Files.Configs .. "/";
 		end;
 
 		function Library:GetFontsDirectory()
-			if not isfolder(Library.Files.Fonts) then 
+			if not isfolder(Library.Files.Directory .. "/" .. Library.Files.Fonts) then
 				Library:DoFolders() end;
 
 			return Library.Files.Directory .. "/" .. Library.Files.Fonts .. "/";
@@ -717,7 +717,7 @@ local Library; do
 			local Config = {};
 
 			local Success, Error = pcall(function()
-				for Index, Value in Library.Flags do 
+				for Index, Value in pairs(Library.Flags) do 
 					if type(Value) == "table" and Value.Mode then
 						Config[Index] = {Key = tostring(Value.Key), Mode = Value.Mode, Toggled = Value.Toggled};
 					elseif type(Value) == "table" and Value.Color then
@@ -741,7 +741,7 @@ local Library; do
 			local Decoded = HttpService:JSONDecode(Config);
 
             local Success, Error = pcall(function()
-                for Index, Value in Decoded do 
+                for Index, Value in pairs(Decoded) do 
 					local SetFunction = Library.SetFlags[Index];
 
 					if not SetFunction then 
@@ -779,7 +779,7 @@ local Library; do
 		function Library:ChangeTheme(Theme, Color)
 			Library.Theme[Theme] = Color
 	
-			for Object, Value in Library.ThemeMap do
+			for Object, Value in pairs(Library.ThemeMap) do
 				local Properties = Value.Properties
 	
 				for PropertyName, PropertyTheme in Properties do
@@ -791,27 +791,16 @@ local Library; do
 		end;
 
 		function Library:ListConfigs(Element)
-			local CurrentList = { };
 			local List = { };
 
-			for Index, Value in listfiles(Library.Files.Directory .. "/" .. Library.Files.Configs) do
-				local FileName = StringGSub(Value, Library.Files.Directory .. "\\Configs\\", ""):gsub(".json", "");
+			for Index, Value in ipairs(listfiles(Library.Files.Directory .. "/" .. Library.Files.Configs)) do
+				local FileName = StringGSub(Value, "\\", "/"):match("([^/]+)$") or Value;
+				FileName = FileName:gsub("%.json$", "");
 				List[#List + 1] = FileName;
 			end;
 
-			local IsNew = #List ~= CurrentList;
-
-			if not IsNew then
-				for Index = 1, #List do
-					if List[Index] ~= CurrentList[Index] then
-						IsNew = true;
-						break;
-					end;
-				end;
-			else
-				CurrentList = List;
-				Element:Refresh(CurrentList);
-			end;
+			table.sort(List);
+			Element:Refresh(List);
 		end;
 
 		function Library:RoundNumber(Number, Float)
@@ -824,7 +813,7 @@ local Library; do
 		end;
 
 		function Library:Unload()
-			for _, Connection in Library.Connections do 
+			for _, Connection in ipairs(Library.Connections) do 
 				Connection.Connection:Disconnect();
 			end;
 
@@ -2442,13 +2431,178 @@ local Library; do
 			end;
 
 			Library:Connect(TabButton.Object.MouseButton1Click, function()
-				for Index, Tab in Page.Window.Tabs do
+				for Index, Tab in ipairs(Page.Window.Tabs) do
 					Tab:Switch(Tab == Page);
 				end;
 			end);
 
 			TableInsert(Page.Window.Tabs, Page);
 			return setmetatable(Page, Library.Pages);
+		end;
+
+		function Library.Pages:Section(Data)
+			Data = Data or {};
+			if not self.Elements.Holders then
+				local SectionHolders = Objects:New("ScrollingFrame", {
+					Parent = self.Elements.TabContent.Object,
+					ScrollBarImageColor3 = FromRGB(0, 0, 0),
+					Active = true,
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					ScrollBarThickness = 0,
+					Name = "SectionHolders",
+					BackgroundTransparency = 1,
+					Size = U2New(1, 0, 1, 0),
+					BackgroundColor3 = FromRGB(255, 255, 255),
+					BorderColor3 = FromRGB(0, 0, 0),
+					BorderSizePixel = 0,
+					CanvasSize = U2New(0, 0, 0, 0)
+				});
+
+				Objects:New("UIPadding", {
+					Parent = SectionHolders.Object,
+					PaddingBottom = UNew(0, 17)
+				});
+
+				local Left = Objects:New("Frame", {
+					Parent = SectionHolders.Object,
+					Name = "Left",
+					BackgroundTransparency = 1,
+					Position = U2New(0.01, 1, 0.013, 1),
+					BorderColor3 = FromRGB(0, 0, 0),
+					Size = U2New(0.47, 4, 1, 0),
+					BorderSizePixel = 0,
+					BackgroundColor3 = FromRGB(255, 255, 255)
+				});
+
+				Objects:New("UIListLayout", {
+					Parent = Left.Object,
+					Padding = UNew(0, 8),
+					SortOrder = Enum.SortOrder.LayoutOrder
+				});
+
+				local Right = Objects:New("Frame", {
+					Parent = SectionHolders.Object,
+					BorderColor3 = FromRGB(0, 0, 0),
+					AnchorPoint = V2New(1, 0),
+					BackgroundTransparency = 1,
+					Position = U2New(0.99, -1, 0.013, 1),
+					Name = "Right",
+					Size = U2New(0.47, 4, 1, 0),
+					BorderSizePixel = 0,
+					BackgroundColor3 = FromRGB(255, 255, 255)
+				});
+
+				Objects:New("UIListLayout", {
+					Parent = Right.Object,
+					Padding = UNew(0, 8),
+					SortOrder = Enum.SortOrder.LayoutOrder
+				});
+
+				self.Elements.Holders = SectionHolders.Object;
+				self.Elements.Left = Left.Object;
+				self.Elements.Right = Right.Object;
+			end
+
+			local Section = {
+				Window = self.Window,
+				Tab = self,
+				SubTab = self,
+				Name = Data.Name or "Section",
+				Side = Data.Side or "Left",
+				Minimized = false,
+				Elements = {},
+			};
+
+			local NewSection = Objects:New("Frame", {
+				Parent = StringLower(tostring(Section.Side)) == "left" and self.Elements.Left or StringLower(tostring(Section.Side)) == "right" and self.Elements.Right or self.Elements.Left,
+				Name = Section.Name,
+				Size = U2New(1, 0, 0, 35),
+				BorderColor3 = FromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundColor3 = Library.Theme.Inline;
+			});
+
+			Library:AddToTheme(NewSection.Object, {BackgroundColor3 = "Inline"});
+			NewSection:Border();
+
+			local Topbar = Objects:New("Frame", {
+				Parent = NewSection.Object,
+				Name = "Topbar",
+				BorderColor3 = FromRGB(0, 0, 0),
+				Size = U2New(1, 0, 0, 20),
+				BorderSizePixel = 0,
+				BackgroundColor3 = Library.Theme.Inline
+			});
+
+			Library:AddToTheme(Topbar.Object, {BackgroundColor3 = "Inline"});
+			Topbar:Border()
+
+			local Liner = Objects:New("Frame", {
+				Parent = Topbar.Object,
+				AnchorPoint = V2New(0, 1),
+				Name = "Liner",
+				Position = U2New(0, 0, 1, 0),
+				BorderColor3 = FromRGB(0, 0, 0),
+				Size = U2New(1, 0, 0, 1),
+				BorderSizePixel = 0,
+				BackgroundColor3 = Library.Theme.Accent
+			});
+
+			Library:AddToTheme(Liner.Object, {BackgroundColor3 = "Accent"});
+
+			Objects:New("UIGradient", {
+				Parent = Liner.Object,
+				Transparency = NumberSeq{NumberKey(0, 1), NumberKey(0.494, 0), NumberKey(1, 1)}
+			});
+
+			local Text = Objects:New("TextLabel", {
+				Parent = Topbar.Object,
+				FontFace = UIFont,
+				TextColor3 = Library.Theme.Text,
+				BorderColor3 = FromRGB(0, 0, 0),
+				Text = Section.Name,
+				Name = "Text",
+				Size = U2New(1, -25, 1, 0),
+				BackgroundTransparency = 1,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = U2New(0, 5, 0, 0),
+				BorderSizePixel = 0,
+				TextSize = 13,
+				BackgroundColor3 = FromRGB(255, 255, 255)
+			});
+
+			Library:AddToTheme(Text.Object, {TextColor3 = "Text"});
+			Text:TextBorder();
+			
+			local Content = Objects:New("Frame", {
+				Parent = NewSection.Object,
+				Name = "Content",
+				BackgroundTransparency = 1,
+				Position = U2New(0, 7, 0, 28),
+				BorderColor3 = FromRGB(0, 0, 0),
+				Size = U2New(1, -14, 1, -20),
+				BorderSizePixel = 0,
+				BackgroundColor3 = FromRGB(255, 255, 255),
+			});
+
+			Objects:New("UIListLayout", {
+				Parent = Content.Object,
+				Padding = UNew(0, 6),
+				SortOrder = Enum.SortOrder.LayoutOrder
+			});
+
+			Objects:New("UIGradient", {
+				Parent = Topbar.Object,
+				Rotation = 90,
+				Color = FromRGBSeq{FromRGBKey(0, FromRGB(255, 255, 255)), FromRGBKey(1, FromRGB(165, 165, 165))}
+			});
+
+			Section.Elements = {
+				Content = Content.Object
+			};
+
+			return setmetatable(Section, Library.Sections);
 		end;
 
 		function Library.Pages:SubPage(Data)
@@ -2603,7 +2757,7 @@ local Library; do
 			end;
 
 			Library:Connect(TabButton.Object.MouseButton1Click, function()
-				for Index, Tab in Page.Window.SubTabs do
+				for Index, Tab in ipairs(Page.Window.SubTabs) do
 					Tab:Switch(Tab == Page);
 				end;
 			end);
@@ -3057,7 +3211,7 @@ local Library; do
 						Keybind.Toggled = true;
 					end;
 	
-					for Index, Value in Modes do 
+					for Index, Value in pairs(Modes) do 
 						if Index == Mode then 
 							Tween:Create(Value, nil, {TextColor3 = Library.Theme.Accent});
 							Library:ChangeObjectTheme(Value, {TextColor3 = "Accent"});
@@ -3134,7 +3288,7 @@ local Library; do
 					if Keybind.Open then
 						ModesWindow.Object.Visible = true;
 						ModesWindow.Object.ZIndex = 15;
-						for Index, Value in ModesWindow.Object:GetChildren() do
+						for Index, Value in ipairs(ModesWindow.Object:GetChildren()) do
 							if Value:IsA("TextButton") then 
 								Value.ZIndex = 15;
 							end;
@@ -3152,7 +3306,7 @@ local Library; do
 						ModesWindow.Object.Visible = false;
 
 						ModesWindow.Object.ZIndex = 1;
-						for Index, Value in ModesWindow.Object:GetChildren() do
+						for Index, Value in ipairs(ModesWindow.Object:GetChildren()) do
 							if Value:IsA("TextButton") then 
 								Value.ZIndex = 1;
 							end;
@@ -3729,7 +3883,7 @@ local Library; do
 					if type(Option) ~= "table" then 
 						return end; 
 
-					for Index, Value in Option do
+					for Index, Value in pairs(Option) do
 						local IsFound = Dropdown.Options[Value];
 
 						if not IsFound then 
@@ -3748,7 +3902,7 @@ local Library; do
 
 					ValueText.Object.Text = TableConcat(Option, ", ");
 
-					for _, Value in Dropdown.Options do 
+					for _, Value in pairs(Dropdown.Options) do 
 						if not table.find(Option, Value.Name) then 
 							Value.IsSelected = false;
 							Tween:Create(Value.Text, nil, {Position = U2New(0, 5, 0, 0), TextTransparency = 0.48});
@@ -3773,7 +3927,7 @@ local Library; do
 					Tween:Create(OptionData.Liner, nil, {BackgroundTransparency = 0, Size = U2New(0, 1, 1, 0)});
 					Tween:Create(OptionData.Glow, nil, {BackgroundTransparency = 0, Size = U2New(0, 25, 1, 0)});
 					
-					for _, Value in Dropdown.Options do 
+					for _, Value in pairs(Dropdown.Options) do 
 						if Value ~= OptionData then 
 							Value.IsSelected = false;
 							Tween:Create(Value.Text, nil, {Position = U2New(0, 5, 0, 0), TextTransparency = 0.48});
@@ -3895,7 +4049,7 @@ local Library; do
 
 							ValueText.Object.Text = NewOption.IsSelected and NewOption.Name or "--";
 
-							for _, Value in Dropdown.Options do 
+							for _, Value in pairs(Dropdown.Options) do 
 								if Value ~= NewOption then 
 									Value.IsSelected = false;
 									Tween:Create(Value.Text, nil, {Position = U2New(0, 5, 0, 0), TextTransparency = 0.48});
@@ -3936,16 +4090,20 @@ local Library; do
 			end;
 
 			function Dropdown:Refresh(List)
-				for _, Option in Dropdown.Options do 
+				for _, Option in pairs(Dropdown.Options) do 
 					Option.Object:Destroy();
 				end;
 
-				for _, Option in List do 
+				Dropdown.Options = {};
+				Dropdown.Value = Dropdown.Multi and {} or nil;
+				Library.Flags[Dropdown.Flag] = Dropdown.Value;
+
+				for _, Option in ipairs(List) do 
 					Dropdown:AddOption(Option);
 				end;
 			end;
 
-			for _, Option in Data.Options do
+			for _, Option in ipairs(Data.Options) do
 				Dropdown:AddOption(Option);
 			end;
 	
@@ -3980,7 +4138,8 @@ local Library; do
 			};
 
 			Colorpicker.Parent = Colorpicker.Section.Elements.Content;
-			Colorpicker.Count += 1;
+			self.Count = (self.Count or 0) + 1;
+			Colorpicker.Count = self.Count;
 
 			local ColorpickerNew = Library:CreateColorpicker(Colorpicker);
 			return Colorpicker;
@@ -4225,7 +4384,7 @@ local Library; do
 					Keybind.Toggled = true;
 				end;
 
-				for Index, Value in Modes do 
+				for Index, Value in pairs(Modes) do 
 					if Index == Mode then 
 						Tween:Create(Value, nil, {TextColor3 = Library.Theme.Accent});
 						Library:ChangeObjectTheme(Value, {TextColor3 = "Accent"});
@@ -4321,7 +4480,7 @@ local Library; do
 					ModesWindow.Object.Visible = true;
 
 					ModesWindow.Object.ZIndex = 15;
-					for Index, Value in ModesWindow.Object:GetChildren() do
+					for Index, Value in ipairs(ModesWindow.Object:GetChildren()) do
 						if Value:IsA("TextButton") then 
 							Value.ZIndex = 15;
 						end;
