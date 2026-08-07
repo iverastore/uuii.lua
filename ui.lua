@@ -110,20 +110,37 @@ end;
 
 local AccentClock = 0;
 local _AccentLastOffset = -999;
-local _AccentConn = game:GetService("RunService").Heartbeat:Connect(function(Dt)
-	AccentClock = AccentClock + Dt * 0.8;
-	local Off = (AccentClock % 2) - 1;
-	
-	local Rounded = math.floor(Off * 50 + 0.5) / 50;
-	if Rounded == _AccentLastOffset then return end;
-	_AccentLastOffset = Rounded;
-	local OffsetV = Vector2.new(Off, 0);
-	for _, G in Library.AccentGradients do
-		if G and G.Parent then
-			G.Offset = OffsetV;
+local _AccentConn = (LPH_NO_VIRTUALIZE and LPH_NO_VIRTUALIZE(function()
+	return game:GetService("RunService").Heartbeat:Connect(function(Dt)
+		AccentClock = AccentClock + Dt * 0.8;
+		local Off = (AccentClock % 2) - 1;
+		
+		local Rounded = math.floor(Off * 50 + 0.5) / 50;
+		if Rounded == _AccentLastOffset then return end;
+		_AccentLastOffset = Rounded;
+		local OffsetV = Vector2.new(Off, 0);
+		for _, G in Library.AccentGradients do
+			if G and G.Parent then
+				G.Offset = OffsetV;
+			end;
 		end;
-	end;
-end);
+	end);
+end) or function()
+	return game:GetService("RunService").Heartbeat:Connect(function(Dt)
+		AccentClock = AccentClock + Dt * 0.8;
+		local Off = (AccentClock % 2) - 1;
+		
+		local Rounded = math.floor(Off * 50 + 0.5) / 50;
+		if Rounded == _AccentLastOffset then return end;
+		_AccentLastOffset = Rounded;
+		local OffsetV = Vector2.new(Off, 0);
+		for _, G in Library.AccentGradients do
+			if G and G.Parent then
+				G.Offset = OffsetV;
+			end;
+		end;
+	end);
+end)();
 
 function Library:OnAccent(Fn)
 	if typeof(Fn) ~= "function" then return end;
@@ -5633,6 +5650,10 @@ function Library:Unload()
 		pcall(function() self._Watermark.Gui:Destroy() end);
 		self._Watermark = nil;
 	end;
+	if self.TargetHUDObj and self.TargetHUDObj.Items and self.TargetHUDObj.Items["Container"] then
+		pcall(function() self.TargetHUDObj.Items["Container"]:Destroy() end);
+		self.TargetHUDObj = nil;
+	end;
 	if self._KeybindList and self._KeybindList.Gui then
 		pcall(function() self._KeybindList.Gui:Destroy() end);
 		self._KeybindList = nil;
@@ -5702,8 +5723,5 @@ function Library:ChangeTheme(key, color)
 		end
 	end
 end
-
-return Library;
-end)()
 
 return Library;
