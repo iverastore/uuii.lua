@@ -163,12 +163,12 @@ local Library; do
 		Flags = { };
 
 		Theme = {
-			["Background"] = FromRGB(16, 18, 20);
-			["Inline"] = FromRGB(23, 25, 27);
-			["Border"] = FromRGB(37, 40, 36);
-			["Accent"] = FromRGB(104, 218, 155);
-			["Text"] = FromRGB(237, 239, 241);
-			["Element"] = FromRGB(35, 38, 41);
+			["Background"] = FromRGB(10, 10, 10);
+			["Inline"] = FromRGB(18, 18, 18);
+			["Border"] = FromRGB(30, 30, 30);
+			["Accent"] = FromRGB(255, 255, 255);
+			["Text"] = FromRGB(240, 240, 240);
+			["Element"] = FromRGB(26, 26, 26);
 			["Text Border"] = FromRGB(0, 0, 0);
 		};
 
@@ -417,7 +417,7 @@ local Library; do
 		end;
 
 		Objects.Resizeable = function(self, Min, Max, Name)
-			Min = Min or V2New(592, 413);
+			Min = Min or V2New(650, 445);
 
 			local Gui = self.Object;
 
@@ -547,7 +547,8 @@ local Library; do
 		Library.Holder = Objects:New("ScreenGui", {
 			Parent =  gethui and gethui() or CoreGui,
 			Name = "\0",
-			ZIndexBehavior = Enum.ZIndexBehavior.Global
+			ZIndexBehavior = Enum.ZIndexBehavior.Global,
+			Enabled = false;
 		});
 
 		Library.NotifHolder = Objects:New("Frame", {
@@ -1032,11 +1033,11 @@ local Library; do
 				local Column = Index % MaxButtonsAdded;
 			
 				local ButtonSize = ColorpickerButton.Object.AbsoluteSize;
-				local Spacing = 28;
+				local Spacing = 14;
 			
-				local XPosition = (ButtonSize.X + Spacing) * Column - Spacing;
+				local XPosition = (ButtonSize.X + Spacing) * Column;
 			
-				return U2New(1, -XPosition, 0, Row * (ButtonSize.Y + Spacing));
+				return U2New(1, -XPosition, 0, Row * (ButtonSize.Y + 2));
 			end;
 
 			ColorpickerButton.Object.Position = CalculateCount(Data.Count);
@@ -2058,6 +2059,22 @@ local Library; do
 			return Watermark;
 		end;
 
+		function Library:Unload()
+			for _, Connection in pairs(Library.Connections) do 
+				pcall(function() Connection.Connection:Disconnect() end)
+			end;
+			if Library.Holder then 
+				pcall(function() Library.Holder.Object:Destroy() end)
+			end;
+			getgenv().Library = nil;
+		end;
+
+		function Library:ShowUI()
+			if Library.Holder then
+				Library.Holder.Object.Enabled = true;
+			end;
+		end;
+
 		function Library:Notification(Text, Duration, Color)
 			local NewNotification = Objects:New("Frame", {
 				Parent = Library.NotifHolder.Object;
@@ -2145,7 +2162,7 @@ local Library; do
 				Parent = Library.Holder.Object,
 				Name = "MainFrame",
 				BorderColor3 = FromRGB(0, 0, 0),
-				Size = U2New(0, 592, 0, 413),
+				Size = U2New(0, 650, 0, 445),
 				Position = U2New(0,Camera.ViewportSize.X / 2,0,Camera.ViewportSize.Y / 2);
 				BorderSizePixel = 0,
 				BackgroundColor3 = Library.Theme.Background
@@ -2196,7 +2213,7 @@ local Library; do
 				Name = "Tabs",
 				Position = U2New(0, 6, 0.5, 0),
 				BorderColor3 = FromRGB(0, 0, 0),
-				Size = U2New(0.25, 0, 1, -12),
+				Size = U2New(0, 150, 1, -12),
 				BorderSizePixel = 0,
 				BackgroundColor3 = Library.Theme.Background
 			}); Library:AddToTheme(Tabs.Object, {BackgroundColor3 = "Background"});
@@ -2230,9 +2247,9 @@ local Library; do
 			local Subtabs = Objects:New("Frame", {
 				Parent = Inline.Object,
 				Name = "Subtabs",
-				Position = U2New(0.27, 0, 0, 6),
+				Position = U2New(0, 162, 0, 6),
 				BorderColor3 = FromRGB(0, 0, 0),
-				Size = U2New(0.72, 4, 0.069, 0),
+				Size = U2New(1, -168, 0.069, 0),
 				BorderSizePixel = 0,
 				BackgroundColor3 = Library.Theme.Background
 			});			
@@ -2252,9 +2269,9 @@ local Library; do
 			local ContentContainer = Objects:New("Frame", {
 				Parent = Inline.Object,
 				Name = "Content",
-				Position = U2New(0.27, 0, 0.1, -1),
+				Position = U2New(0, 162, 0.1, -1),
 				BorderColor3 = FromRGB(0, 0, 0),
-				Size = U2New(0.72, 4, 0.886, 0),
+				Size = U2New(1, -168, 0.886, 0),
 				BorderSizePixel = 0,
 				BackgroundColor3 = Library.Theme.Background
 			});	Library:AddToTheme(ContentContainer.Object, {BackgroundColor3 = "Background"});		
@@ -2310,7 +2327,8 @@ local Library; do
 				end, Gui.Name .. "Draggable3");
 			end;
 
-			MainFrame:Resizeable(V2New(592, 413), V2New(9999, 9999));
+			-- Auto-resize removed: window is a fixed size
+
 
 			Library:Connect(UserInputService.InputBegan, function(Input)
 				if Input.KeyCode == Library.MenuKeybind or Input.UserInputType == Library.MenuKeybind then
@@ -3353,19 +3371,15 @@ local Library; do
 					Keybind:Set("Always");
 				end);
 
-				Library:Connect(UserInputService.InputBegan, function(Input)
-					if tostring(Input.KeyCode) == Keybind.Key and not Keybind.Picking then 
-						if Keybind.Mode == "Toggle" then 
-							Keybind:Press();
-						elseif Keybind.Mode == "Hold" then 
-							Keybind:Press(true);
-						end;
-					elseif tostring(Input.UserInputType) == Keybind.Key and not Keybind.Picking then 
-						if Keybind.Mode == "Toggle" then 
-							Keybind:Press();
-						elseif Keybind.Mode == "Hold" then 
-							Keybind:Press(true);
-						end;
+				Library:Connect(UserInputService.InputBegan, function(Input, processed)
+					if processed then return end;
+					if Keybind.Picking then return end;
+					-- Ignore standard mouse clicks or focus inputs
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 or Input.UserInputType == Enum.UserInputType.MouseButton3 or Input.UserInputType == Enum.UserInputType.Touch or Input.UserInputType == Enum.UserInputType.Focus then
+						return
+					end;
+					if tostring(Input.KeyCode) == Keybind.Key or tostring(Input.UserInputType) == Keybind.Key then
+						Keybind:Press(true);
 					end;
 				end);
 	
@@ -4211,8 +4225,8 @@ local Library; do
 			};
 
 			Colorpicker.Parent = Colorpicker.Section.Elements.Content;
-			self.Count = (self.Count or 0) + 1;
-			Colorpicker.Count = self.Count;
+			-- Standalone section colorpickers always use Count=0 (always on their own label row, right-aligned)
+			Colorpicker.Count = 0;
 
 			local ColorpickerNew = Library:CreateColorpicker(Colorpicker);
 			return Colorpicker;
@@ -4528,13 +4542,15 @@ local Library; do
 				end);
 			end);
 
-			Library:Connect(UserInputService.InputBegan, function(Input)
-				if Input.KeyCode == Keybind.Key or Input.UserInputType == Keybind.Key then
-					if Keybind.Mode == "Toggle" then
-						Keybind:Press();
-					elseif Keybind.Mode == "Hold" then
-						Keybind:Press(true);
-					end;
+			Library:Connect(UserInputService.InputBegan, function(Input, processed)
+				if processed then return end;
+				if Keybind.Picking then return end;
+				-- Ignore standard mouse clicks or focus inputs
+				if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.MouseButton2 or Input.UserInputType == Enum.UserInputType.MouseButton3 or Input.UserInputType == Enum.UserInputType.Touch or Input.UserInputType == Enum.UserInputType.Focus then
+					return
+				end;
+				if tostring(Input.KeyCode) == Keybind.Key or tostring(Input.UserInputType) == Keybind.Key then
+					Keybind:Press(true);
 				end;
 			end);
 
