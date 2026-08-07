@@ -920,7 +920,8 @@ local Library; do
 					TextXAlignment = Enum.TextXAlignment.Center,
 					BorderSizePixel = 0,
 					TextSize = 13,
-					BackgroundColor3 = FromRGB(255, 255, 255)
+					BackgroundColor3 = FromRGB(255, 255, 255),
+					Visible = false
 				}); Library:AddToTheme(NewKey.Object, {TextColor3 = "Text"});
 
 				function NewKey:Set(Name, Key, Mode)
@@ -928,6 +929,7 @@ local Library; do
 				end
 
 				function NewKey:SetStatus(Bool)
+					NewKey.Object.Visible = Bool;
 					if Bool then 
 						NewKey:Tween(nil, {TextColor3 = Library.Theme.Accent});
 						Library:ChangeObjectTheme(NewKey.Object, {TextColor3 = "Accent"});
@@ -1969,6 +1971,14 @@ local Library; do
 				Colorpicker:SetOpen(not Colorpicker.Open);
 			end);
 
+			function Colorpicker:SetVisiblity(Bool)
+				if Data.IsToggle then
+					ColorpickerButton.Object.Visible = Bool;
+				else
+					NewColorpicker.Object.Visible = Bool;
+				end;
+			end;
+
 			if Data.Default then
 				Colorpicker:Set(Data.Default, Data.Alpha);
 			end;
@@ -2039,6 +2049,10 @@ local Library; do
 
 			function Watermark:SetVisiblity(Bool)
 				WatermarkBackground.Object.Visible = Bool;
+			end;
+
+			function Watermark:SetText(NewText)
+				WatermarkText.Object.Text = NewText;
 			end;
 
 			return Watermark;
@@ -2153,6 +2167,7 @@ local Library; do
 				Size = U2New(1, 0, 0, 20),
 				BorderSizePixel = 0,
 				TextSize = 13,
+				RichText = true,
 				BackgroundColor3 = FromRGB(255, 255, 255)
 			}) Library:AddToTheme(Title.Object, {TextColor3 = "Text"});
 			
@@ -2916,6 +2931,7 @@ local Library; do
 				TextSize = 14,
 				BackgroundColor3 = FromRGB(255, 255, 255)
 			});
+			Toggle.Object = NewToggle.Object;
 
 			NewToggle:Tooltip(Toggle.Tooltip);
 
@@ -3374,6 +3390,47 @@ local Library; do
 			return Toggle;
 		end;
 
+		function Library.Sections:Label(Data)
+			Data = Data or {};
+
+			local Label = {
+				Window = self.Window,
+				Tab = self.Tab,
+				SubPage = self.SubTab,
+				Section = self,
+				Name = Data.Name or 'Label',
+				Class = "Label"
+			};
+
+			local NewLabel = Objects:New("TextLabel", {
+				Parent = Label.Section.Elements.Content,
+				FontFace = UIFont,
+				TextColor3 = Library.Theme.Text,
+				BorderColor3 = FromRGB(0, 0, 0),
+				Text = Label.Name,
+				Name = "Label",
+				Size = U2New(1, 0, 0, 16),
+				BackgroundTransparency = 1,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				BorderSizePixel = 0,
+				TextSize = 13,
+				BackgroundColor3 = FromRGB(255, 255, 255)
+			}); Library:AddToTheme(NewLabel.Object, {TextColor3 = "Text"});
+
+			NewLabel:TextBorder();
+
+			function Label:Set(Text)
+				Label.Name = Text;
+				NewLabel.Object.Text = Text;
+			end;
+
+			function Label:SetVisiblity(Bool)
+				NewLabel.Object.Visible = Bool;
+			end;
+
+			return Label;
+		end;
+
 		function Library.Sections:Button(Data)
 			local Button = {
 				Window = self.Window,
@@ -3389,16 +3446,17 @@ local Library; do
 			local NewButton = Objects:New("TextButton", {
 				Parent = Button.Section.Elements.Content,
 				FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+				FontFace = UIFont,
 				TextColor3 = FromRGB(0, 0, 0),
 				BorderColor3 = FromRGB(0, 0, 0),
 				Text = "",
 				AutoButtonColor = false,
-				Name = Button.Name,
-				Size = U2New(1, 0, 0, 15),
+				Size = U2New(1, 0, 0, 20),
 				BorderSizePixel = 0,
 				TextSize = 14,
 				BackgroundColor3 = Library.Theme.Element
 			}); Library:AddToTheme(NewButton.Object, {BackgroundColor3 = "Element"})
+			Button.Object = NewButton.Object;
 			
 			NewButton:Tooltip(Button.Tooltip);
 			NewButton:Border();
@@ -4113,6 +4171,10 @@ local Library; do
 				Dropdown:AddOption(Option);
 			end;
 	
+			function Dropdown:SetVisiblity(Bool)
+				NewDropdown.Object.Visible = Bool;
+			end;
+
 			if Dropdown.Default then
 				Dropdown:Set(Dropdown.Default);
 			end;
