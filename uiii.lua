@@ -329,7 +329,7 @@ local Library; do
 
 			setmetatable(Item, Objects);
 
-			for Property, Value in Properties do
+			for Property, Value in pairs(Properties) do
 				Item.Object[Property] = Value;
 			end;
 
@@ -665,7 +665,7 @@ local Library; do
 		end;
 
 		function Library:Disconnect(Name)
-			for _, Connection in Library.Connections do 
+			for _, Connection in pairs(Library.Connections) do 
 				if Connection.Name == Name then 
 					Connection.Connection:Disconnect();
 					break;
@@ -696,7 +696,7 @@ local Library; do
 				Properties = Properties,
 			};
 
-			for Index, Value in Data.Properties do
+			for Index, Value in pairs(Data.Properties) do
 				if type(Value) == "string" then
 					Data.Instance[Index] = Library.Theme[Value];
 				else
@@ -782,7 +782,7 @@ local Library; do
 			for Object, Value in pairs(Library.ThemeMap) do
 				local Properties = Value.Properties
 	
-				for PropertyName, PropertyTheme in Properties do
+				for PropertyName, PropertyTheme in pairs(Properties) do
 					if PropertyTheme == Theme then
 						Object[PropertyName] = Color;
 					end;
@@ -826,6 +826,9 @@ local Library; do
 		end;
 
 		function Library:KeybindList(Name)
+			if type(Name) == "table" then
+				Name = Name.Title or Name.Name or Name.Text or "Keybinds"
+			end
 			local KeybindList = {};
 
 			Library.KeyList = KeybindList
@@ -1985,7 +1988,10 @@ local Library; do
 		end;
 
 		function Library:Watermark(Text)
-			local Watermark = { };
+			if type(Text) == "table" then
+				Text = Text.Text or Text.Name or "Watermark"
+			end
+			local Watermark = {};
 
 			local WatermarkBackground = Objects:New("Frame", {
 				Parent = Library.Holder.Object;
@@ -4654,5 +4660,6 @@ local Library; do
 end;
 
 -- Export the reusable library module.
+Library.Notify = Library.Notification;
 getgenv().Library = Library;
 return Library;
